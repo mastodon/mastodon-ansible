@@ -1,3 +1,4 @@
 /playbook.retry
 /.vagrant
 /*.log
+/env
