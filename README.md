@@ -6,7 +6,7 @@ This playbook contains several roles for provisioning a ready-to-go Mastodon ins
 - `postgres`: A role for installing a [PostgreSQL](https://www.postgresql.org/) database, the databse used by Mastodon
 - `redis`: A role for installing the key-value store [Redis](https://redis.io), used by Mastodon for caching purposes
 
-## Prerequities
+## Prerequisites
 
 - Python 2.x (>= 2.7.12)
 - Virtualenv (>= 15.0.3)
@@ -42,3 +42,8 @@ $ vagrant up
 This should provision a new instance within VirtualBox and run all the tests necessary to verify the Ansible playbook is valid.
 
 _Note: This assumes you're within the virtualenv already._
+
+# TODO
+
+- Add a firewall/sysctl role for hardening
+- Add CentOS/RedHat/Amazon Linux support
