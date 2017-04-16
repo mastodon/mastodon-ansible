@@ -1,0 +1,10 @@
+---
+- name: mastodon
+  hosts: all
+  roles:
+    - basic
+    - postgres
+    - redis
+  vars:
+    rbenv_home: "{{ ansible_env.HOME }}/.rbenv"
+

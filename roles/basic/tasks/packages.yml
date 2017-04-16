@@ -1,0 +1,29 @@
+---
+
+- name: Install packages
+  package:
+    name: "{{ item.package }}"
+    update_cache: yes
+    cache_valid_time: 3600
+    state: latest
+    install_recommends: no
+  become: yes
+  with_items:
+    - package: "libssl-dev"
+    - package: "zlib1g-dev"
+    - package: "git-core"
+    - package: "build-essential"
+    - package: "libxml2-dev"
+    - package: "libxslt1-dev"
+    - package: "imagemagick"
+    - package: "nodejs"
+    - package: "yarn"
+    - package: "libreadline-dev"
+
+
+- name: nodejs alternative
+  become: yes
+  alternatives:
+    name: node
+    link: /usr/bin/node
+    path: /usr/bin/nodejs

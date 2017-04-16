@@ -1,0 +1,14 @@
+---
+
+- name: Install Postgres packages
+  package:
+    name: "{{ item.package }}"
+    update_cache: yes
+    cache_valid_time: 3600
+    state: latest
+    install_recommends: no
+  become: yes
+  with_items:
+    - package: "libpq-dev"
+    - package: "postgresql"
+    - package: "postgresql-contrib"

@@ -1,0 +1,63 @@
+---
+
+- name: Clone rbenv
+  git:
+    repo: "https://github.com/rbenv/rbenv.git"
+    dest: "{{ rbenv_home }}"
+    clone: true
+    version: "{{ rbenv_version }}"
+
+- name: Clone ruby-build
+  git:
+    repo: "https://github.com/rbenv/ruby-build.git"
+    dest: "{{ rbenv_home}}/plugins/ruby-build"
+    clone: true
+    version: "{{ ruby_build_version }}"
+  register: ruby_build
+
+- name: Configure rbenv
+  command: ./configure
+  args:
+    chdir: "{{ rbenv_home }}/src"
+  register: rbenv_configure
+
+- name: Build rbenv
+  command: make
+  args:
+    chdir: "{{ rbenv_home }}/src"
+  when: rbenv_configure|succeeded
+
+- name: Update profile settings
+  blockinfile:
+    insertafter: EOF
+    dest: "{{ ansible_env.HOME }}/.bashrc"
+    content: |
+      export PATH="{{ rbenv_home }}/bin:${PATH}"
+      eval "$(rbenv init -)"
+
+- name: Check if the Ruby version is already installed
+  shell: /bin/bash -lc "{{ rbenv_home }}/bin/rbenv versions | grep -q {{ ruby_version }}"
+  register: ruby_installed
+  changed_when: false
+  ignore_errors: yes
+  failed_when: false
+  check_mode: no
+
+- name: Install Ruby {{ ruby_version }}
+  command: /bin/bash -lc "{{ rbenv_home }}/bin/rbenv install {{ ruby_version }}"
+  args:
+    chdir: "{{ ansible_env.HOME }}"
+  when: ruby_installed|failed
+
+- name: Set the default Ruby version to {{ ruby_version }}
+  command: /bin/bash -lc "{{ rbenv_home }}/bin/rbenv global {{ ruby_version }}"
+  args:
+    chdir: "{{ ansible_env.HOME }}"
+  register: default_ruby_version
+
+- gem:
+    name: bundler
+    executable: "{{ rbenv_home }}/shims/gem"
+    state: latest
+    user_install: false
+  when: default_ruby_version|succeeded
