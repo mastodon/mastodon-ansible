@@ -1,0 +1,25 @@
+ubuntu_codename: "xenial"
+bash_configuration: ".bashrc"
+
+packages:
+  - package: "libssl-dev"
+  - package: "zlib1g-dev"
+  - package: "git-core"
+  - package: "build-essential"
+  - package: "libxml2-dev"
+  - package: "libxslt1-dev"
+  - package: "imagemagick"
+  - package: "nodejs"
+  - package: "yarn"
+  - package: "libreadline-dev"
+
+postgres:
+  packages:
+    - package: "libpq-dev"
+    - package: "postgresql"
+    - package: "postgresql-contrib"
+
+redis:
+  packages:
+    - package: "redis-server"
+    - package: "redis-tools"

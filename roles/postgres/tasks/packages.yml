@@ -8,7 +8,4 @@
     state: latest
     install_recommends: no
   become: yes
-  with_items:
-    - package: "libpq-dev"
-    - package: "postgresql"
-    - package: "postgresql-contrib"
+  with_items: "{{ postgres.packages }}"

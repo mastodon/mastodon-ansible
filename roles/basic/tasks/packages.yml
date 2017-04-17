@@ -8,18 +8,7 @@
     state: latest
     install_recommends: no
   become: yes
-  with_items:
-    - package: "libssl-dev"
-    - package: "zlib1g-dev"
-    - package: "git-core"
-    - package: "build-essential"
-    - package: "libxml2-dev"
-    - package: "libxslt1-dev"
-    - package: "imagemagick"
-    - package: "nodejs"
-    - package: "yarn"
-    - package: "libreadline-dev"
-
+  with_items: "{{ packages }}"
 
 - name: nodejs alternative
   become: yes

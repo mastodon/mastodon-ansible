@@ -30,7 +30,7 @@
 - name: Update profile settings
   blockinfile:
     insertafter: EOF
-    dest: "{{ ansible_env.HOME }}/.bashrc"
+    dest: "{{ ansible_env.HOME }}/{{ bash_configuration }}"
     content: |
       export PATH="{{ rbenv_home }}/bin:${PATH}"
       eval "$(rbenv init -)"

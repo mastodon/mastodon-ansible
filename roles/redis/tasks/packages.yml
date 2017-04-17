@@ -8,6 +8,4 @@
     state: latest
     install_recommends: no
   become: yes
-  with_items:
-    - package: "redis-server"
-    - package: "redis-tools"
+  with_items: "{{ redis.packages }}"

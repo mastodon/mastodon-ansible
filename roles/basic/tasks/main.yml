@@ -1,5 +1,7 @@
 ---
 
 - include: repositories.yml
+  when: os_family == "debian"
+
 - include: packages.yml
 - include: ruby.yml

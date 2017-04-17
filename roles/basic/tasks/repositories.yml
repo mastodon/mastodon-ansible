@@ -19,4 +19,4 @@
   become: yes
   with_items:
     - repo: "deb https://dl.yarnpkg.com/debian/ stable main"
-    - repo: "deb https://deb.nodesource.com/node_4.x xenial main"
+    - repo: "deb https://deb.nodesource.com/node_4.x {{ ubuntu_codename }} main"
