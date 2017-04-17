@@ -1,6 +1,6 @@
 Vagrant.configure('2') do |config|
   config.vm.box = 'ubuntu/xenial64'
-  config.vm.network 'private_network', type: 'dhcp', bridge: 'wlp2s0'
+  config.vm.network 'private_network', type: 'dhcp'
 
   # Just install Python for now
   config.vm.provision 'shell' do |shell|
