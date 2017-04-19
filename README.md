@@ -2,8 +2,8 @@
 
 This playbook contains several roles for provisioning a ready-to-go Mastodon instance:
 
-- `basic`: The basics for running Mastodon, mostly Ruby related
-- `postgres`: A role for installing a [PostgreSQL](https://www.postgresql.org/) database, the databse used by Mastodon
+- `basic`: The basics for running Mastodon, mostly core packages and Ruby/Rails related
+- `postgres`: A role for installing [PostgreSQL](https://www.postgresql.org/), the database used by Mastodon
 - `redis`: A role for installing the key-value store [Redis](https://redis.io), used by Mastodon for caching purposes
 
 ## Prerequisites

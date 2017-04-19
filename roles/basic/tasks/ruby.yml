@@ -36,7 +36,7 @@
       eval "$(rbenv init -)"
 
 - name: Check if the Ruby version is already installed
-  shell: /bin/bash -lc "{{ rbenv_home }}/bin/rbenv versions | grep -q {{ ruby_version }}"
+  shell: "{{ rbenv_home }}/bin/rbenv versions | grep -q {{ ruby_version }}"
   register: ruby_installed
   changed_when: false
   ignore_errors: yes
@@ -44,13 +44,13 @@
   check_mode: no
 
 - name: Install Ruby {{ ruby_version }}
-  command: /bin/bash -lc "{{ rbenv_home }}/bin/rbenv install {{ ruby_version }}"
+  command: "{{ rbenv_home }}/bin/rbenv install {{ ruby_version }}"
   args:
     chdir: "{{ ansible_env.HOME }}"
   when: ruby_installed|failed
 
 - name: Set the default Ruby version to {{ ruby_version }}
-  command: /bin/bash -lc "{{ rbenv_home }}/bin/rbenv global {{ ruby_version }}"
+  command: "{{ rbenv_home }}/bin/rbenv global {{ ruby_version }}"
   args:
     chdir: "{{ ansible_env.HOME }}"
   register: default_ruby_version
