@@ -1,0 +1,19 @@
+---
+
+dependencies: []
+
+galaxy_info:
+  author: moritzheiber
+  description: Playbook for installing Mastodon
+  license: "license MIT"
+  min_ansible_version: 2.3
+  platforms:
+    - name: Ubuntu
+      versions:
+        - xenial
+  galaxy_tags:
+    - mastodon
+    - database
+    - rails
+
+allow_duplicates: yes
