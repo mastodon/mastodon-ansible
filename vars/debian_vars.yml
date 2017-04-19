@@ -12,6 +12,7 @@ packages:
   - package: "nodejs"
   - package: "yarn"
   - package: "libreadline-dev"
+  - package: "ffmpeg"
 
 postgres:
   packages:

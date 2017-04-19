@@ -44,13 +44,13 @@
   check_mode: no
 
 - name: Install Ruby {{ ruby_version }}
-  command: "{{ rbenv_home }}/bin/rbenv install {{ ruby_version }}"
+  shell: "{{ rbenv_home }}/bin/rbenv install {{ ruby_version }}"
   args:
     chdir: "{{ ansible_env.HOME }}"
   when: ruby_installed|failed
 
 - name: Set the default Ruby version to {{ ruby_version }}
-  command: "{{ rbenv_home }}/bin/rbenv global {{ ruby_version }}"
+  shell: "{{ rbenv_home }}/bin/rbenv global {{ ruby_version }}"
   args:
     chdir: "{{ ansible_env.HOME }}"
   register: default_ruby_version
