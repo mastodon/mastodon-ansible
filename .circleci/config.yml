@@ -10,7 +10,7 @@ jobs:
           name: Install Python deps in a venv
           command: |
             apt-get update -qq
-            apt-get install -y --no-install-recommends virtualenv python-pip
+            apt-get install -y --no-install-recommends virtualenv python-pip build-essential libffi-dev libssl-dev
             virtualenv env
             source env/bin/activate
             pip install -r requirements.txt
