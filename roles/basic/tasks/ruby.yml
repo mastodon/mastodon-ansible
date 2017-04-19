@@ -47,12 +47,14 @@
   shell: "{{ rbenv_home }}/bin/rbenv install {{ ruby_version }}"
   args:
     chdir: "{{ ansible_env.HOME }}"
+    executable: /bin/bash
   when: ruby_installed|failed
 
 - name: Set the default Ruby version to {{ ruby_version }}
   shell: "{{ rbenv_home }}/bin/rbenv global {{ ruby_version }}"
   args:
     chdir: "{{ ansible_env.HOME }}"
+    executable: /bin/bash
   register: default_ruby_version
 
 - gem:
