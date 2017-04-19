@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/tootsuite/mastodon-ansible.svg?style=svg)](https://circleci.com/gh/tootsuite/mastodon-ansible) # Ansible playbook for installing Mastodon
+# [![CircleCI](https://circleci.com/gh/tootsuite/mastodon-ansible.svg?style=svg)](https://circleci.com/gh/tootsuite/mastodon-ansible) Ansible playbook for installing Mastodon
 
 This playbook contains several roles for provisioning a ready-to-go Mastodon instance:
 
