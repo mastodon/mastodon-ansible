@@ -17,4 +17,4 @@ jobs:
       - run:
           command: |
             source env/bin/activate
-            ansible-playbook ansible/playbook.yml -v --connection=local
+            ansible-playbook playbook.yml -v --connection=local
