@@ -30,7 +30,7 @@
 - name: Update profile settings
   blockinfile:
     insertafter: EOF
-    dest: "{{ ansible_env.HOME }}/{{ bash_configuration }}"
+    dest: "{{ mastodon_home }}/{{ bash_configuration }}"
     content: |
       export PATH="{{ rbenv_home }}/bin:${PATH}"
       eval "$(rbenv init -)"
@@ -46,14 +46,14 @@
 - name: Install Ruby {{ ruby_version }}
   shell: "{{ rbenv_home }}/bin/rbenv install {{ ruby_version }}"
   args:
-    chdir: "{{ ansible_env.HOME }}"
+    chdir: "{{ mastodon_home }}"
     executable: /bin/bash
   when: ruby_installed|failed
 
 - name: Set the default Ruby version to {{ ruby_version }}
   shell: "{{ rbenv_home }}/bin/rbenv global {{ ruby_version }}"
   args:
-    chdir: "{{ ansible_env.HOME }}"
+    chdir: "{{ mastodon_home }}"
     executable: /bin/bash
   register: default_ruby_version
 

@@ -1,0 +1,8 @@
+- name: Create Mastodon user
+  user:
+    name: "{{ mastodon_user }}"
+    createhome: true
+    shell: /bin/bash
+    home: "{{ mastodon_home }}"
+  become: true
+
