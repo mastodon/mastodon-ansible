@@ -14,6 +14,7 @@ packages:
   - package: "libreadline-dev"
   - package: "ffmpeg"
   - package: "curl"
+  - package: "sudo"
 
 postgres:
   packages:
