@@ -5,4 +5,5 @@ os_family: "{{ ansible_os_family|lower }}"
 mastodon_user: "mastodon"
 rbenv_home: "/usr/lib/rbenv"
 mastodon_home: "/home/{{ mastodon_user }}"
-
+mastodon_db_user: "{{ mastodon_user }}"
+mastodon_db: "{{ mastodon_user }}_development"

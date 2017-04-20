@@ -10,11 +10,11 @@ jobs:
           name: Install Python deps in a venv
           command: |
             apt-get update -qq
-            apt-get install -y --no-install-recommends virtualenv python-pip python-dev build-essential libffi-dev libssl-dev
+            apt-get install -y --no-install-recommends virtualenv python-pip python-dev build-essential libffi-dev libssl-dev libpq-dev
             virtualenv env
             source env/bin/activate
             pip install -r requirements.txt
       - run:
           command: |
             source env/bin/activate
-            ansible-playbook playbook.yml -v --connection=local -i localhost,
+            ansible-playbook playbook.yml -v --connection=local -i localhost, --extra-vars="@templates/secrets.yml.tpl"
