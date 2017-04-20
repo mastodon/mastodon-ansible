@@ -13,6 +13,7 @@ packages:
   - package: "yarn"
   - package: "libreadline-dev"
   - package: "ffmpeg"
+  - package: "curl"
 
 postgres:
   packages:
