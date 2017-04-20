@@ -3,6 +3,6 @@ rbenv_version: v1.1.0
 ruby_build_version: v20170405
 os_family: "{{ ansible_os_family|lower }}"
 mastodon_user: "mastodon"
-rbenv_home: "/home/{{ mastodon_user }}/.rbenv"
+rbenv_home: "/usr/lib/rbenv"
 mastodon_home: "/home/{{ mastodon_user }}"
 

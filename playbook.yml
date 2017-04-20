@@ -9,3 +9,5 @@
     - basic
     - postgres
     - redis
+  environment:
+    RBENV_ROOT: "{{ rbenv_home }}"

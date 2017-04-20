@@ -10,10 +10,17 @@
 - name: Clone ruby-build
   git:
     repo: "https://github.com/rbenv/ruby-build.git"
-    dest: "{{ rbenv_home}}/plugins/ruby-build"
+    dest: "/tmp/ruby-build"
     clone: true
     version: "{{ ruby_build_version }}"
   register: ruby_build
+
+- name: Configure rbenv
+  shell: PREFIX="/usr" ./install.sh
+  args:
+    chdir: "/tmp/ruby-build"
+  register: rbenv_build_install
+  become: true
 
 - name: Configure rbenv
   command: ./configure
@@ -28,11 +35,11 @@
   when: rbenv_configure|succeeded
 
 - name: Update profile settings
-  blockinfile:
-    insertafter: EOF
-    dest: "{{ mastodon_home }}/{{ bash_configuration }}"
+  copy:
+    dest: "/etc/profile.d/rbenv.sh"
     content: |
       export PATH="{{ rbenv_home }}/bin:${PATH}"
+      export RBENV_ROOT="{{ rbenv_home }}"
       eval "$(rbenv init -)"
 
 - name: Check if the Ruby version is already installed
@@ -46,14 +53,12 @@
 - name: Install Ruby {{ ruby_version }}
   shell: "{{ rbenv_home }}/bin/rbenv install {{ ruby_version }}"
   args:
-    chdir: "{{ mastodon_home }}"
     executable: /bin/bash
   when: ruby_installed|failed
 
 - name: Set the default Ruby version to {{ ruby_version }}
   shell: "{{ rbenv_home }}/bin/rbenv global {{ ruby_version }}"
   args:
-    chdir: "{{ mastodon_home }}"
     executable: /bin/bash
   register: default_ruby_version
 

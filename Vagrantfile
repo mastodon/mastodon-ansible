@@ -21,15 +21,11 @@ EOF
     ansible.verbose = true
   end
 
-  config.vm.provision 'file',
-                      source: 'Gemfile',
-                      destination: 'Gemfile'
-  config.vm.provision 'file',
-                      source: 'Gemfile.lock',
-                      destination: 'Gemfile.lock'
-  config.vm.provision 'file',
-                      source: 'spec',
-                      destination: 'spec'
+  %w[Gemfile Gemfile.lock spec .rspec].each do |file|
+    config.vm.provision 'file',
+                        source: file,
+                        destination: file
+  end
 
   config.vm.provision 'shell' do |shell|
     shell.privileged = false
