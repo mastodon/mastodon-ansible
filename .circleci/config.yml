@@ -31,6 +31,7 @@ jobs:
           environment:
             - RBENV_ROOT: "/usr/lib/rbenv"
           command: |
+            source /etc/profile.d/rbenv.sh
             bundle install --path vendor/bundle
             bundle exec rubocop
             bundle exec rspec
