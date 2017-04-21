@@ -1,15 +1,9 @@
-- shell: psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='{{ mastodon_db_user }}'"
-  register: number_of_user_exists
-
-- shell: psql -lqt | cut -d \| -f 1 | grep -qw {{ mastodon_db }}
-  register: database_exists
-  ignore_errors: true
-  failed_when: false
-
 - name: Create database user {{ mastodon_user }}
-  command: psql -c "CREATE USER {{ mastodon_db_user }} WITH PASSWORD '{{ mastodon_db_password }}' CREATEDB"
-  when: number_of_user_exists.stdout == ""
+  postgresql_user:
+    name: "{{ mastodon_db_user }}"
+    password: "{{ mastodon_db_password }}"
+    role_attr_flags: CREATEDB
 
 - name: Create database {{ mastodon_db }}
-  command: createdb -U postgres {{ mastodon_db }}
-  when: database_exists|failed
+  postgresql_db:
+    name: "{{ mastodon_db }}"
