@@ -1,13 +1,30 @@
 ---
 
-- name: mastodon
-  hosts: all
+- hosts: all
   vars_files:
     - "vars/common.yml"
     - ["vars/{{ ansible_os_family|lower }}_vars.yml"]
   roles:
     - basic
-    - postgres
-    - redis
   environment:
     RBENV_ROOT: "{{ rbenv_home }}"
+  tags:
+    - basic
+
+- hosts: all
+  vars_files:
+    - "vars/common.yml"
+    - ["vars/{{ ansible_os_family|lower }}_vars.yml"]
+  roles:
+    - postgres
+  tags:
+    - postgres
+
+- hosts: all
+  vars_files:
+    - "vars/common.yml"
+    - ["vars/{{ ansible_os_family|lower }}_vars.yml"]
+  roles:
+    - redis
+  tags:
+    - redis
