@@ -7,3 +7,4 @@ rbenv_home: "/usr/lib/rbenv"
 mastodon_home: "/home/{{ mastodon_user }}"
 mastodon_db_user: "{{ mastodon_user }}"
 mastodon_db: "{{ mastodon_user }}_development"
+mastodon_db_port: 5432
