@@ -22,4 +22,4 @@ jobs:
       - run:
           command: |
             source env/bin/activate
-            ansible-playbook playbook.yml -v --connection=local -i localhost, --extra-vars="@templates/secrets.yml.tpl" --extra-vars="mastodon_db_password=CHANGEME,mastodon_db_login_user=mastodon,mastodon_db_login_host=localhost,mastodon_db_login_password=CHANGEME"
+            ansible-playbook playbook.yml -v --connection=local -i localhost, --extra-vars="@templates/secrets.yml.tpl" --extra-vars="mastodon_db_password=CHANGEME mastodon_db_login_user=mastodon mastodon_db_login_host=localhost mastodon_db_login_password=CHANGEME"
