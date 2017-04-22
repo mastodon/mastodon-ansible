@@ -73,12 +73,10 @@ describe 'Ansible Debian target' do
   end
 
   context 'redis role' do
-    describe port(6379) do
-      it { should be_listening }
-    end
-
-    describe service('redis') do
-      it { should be_running }
+    %w[redis redis-tools].each do |p|
+      describe package(p) do
+        it { should be_installed }
+      end
     end
   end
 end
