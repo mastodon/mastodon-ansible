@@ -73,7 +73,7 @@ describe 'Ansible Debian target' do
   end
 
   context 'redis role' do
-    %w[redis redis-tools].each do |p|
+    %w[redis-server redis-tools].each do |p|
       describe package(p) do
         it { should be_installed }
       end
