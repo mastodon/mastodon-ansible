@@ -22,6 +22,7 @@
     login_user: "{{ mastodon_db_login_user }}"
     port: "{{ mastodon_db_port }}"
     role_attr_flags: CREATEDB
+  register: create_remote_db_user
   when:
     - mastodon_db_login_user is defined
     - mastodon_db_login_host is defined
@@ -42,4 +43,4 @@
     password: "{{ mastodon_db_password }}"
     login_unix_socket: "{{ mastodon_db_login_unix_socket }}"
     role_attr_flags: CREATEDB
-  when: create_local_db|succeeded
+  when: create_remote_db_user|skipped
