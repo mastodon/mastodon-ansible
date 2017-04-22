@@ -21,8 +21,7 @@ EOF
   config.vm.provision 'ansible' do |ansible|
     ansible.playbook = 'playbook.yml'
     ansible.extra_vars = {
-      mastodon_db_password: 'CHANGEME',
-      mastodon_db_login_unix_socket: '/var/run/postgresql'
+      mastodon_db_password: 'CHANGEME'
     }
     ansible.verbose = true
   end

@@ -5,6 +5,7 @@
     login_password: "{{ mastodon_db_login_password }}"
     login_user: "{{ mastodon_db_login_user }}"
     port: "{{ mastodon_db_port }}"
+  register: create_remote_db
   when:
     - mastodon_db_login_user is defined
     - mastodon_db_login_host is defined
@@ -31,7 +32,8 @@
   postgresql_db:
     name: "{{ mastodon_db }}"
     login_unix_socket: "{{ mastodon_db_login_unix_socket }}"
-  when: mastodon_db_login_unix_socket is defined
+  register: create_local_db
+  when: create_remote_db|skipped
 
 - name: Create database user {{ mastodon_db_user }}
   postgresql_user:
@@ -40,4 +42,4 @@
     password: "{{ mastodon_db_password }}"
     login_unix_socket: "{{ mastodon_db_login_unix_socket }}"
     role_attr_flags: CREATEDB
-  when: mastodon_db_login_unix_socket is defined
+  when: create_local_db|succeeded

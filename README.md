@@ -41,7 +41,7 @@ Skipping the `postgres` role:
 $ ansible-playbook playbook.yml --skip-tags=postgres -i <your-host>, -u <your-user>
 ```
 
-### Basic
+### web
 
 This role contains the following tasks:
 
@@ -50,9 +50,9 @@ This role contains the following tasks:
 - `ruby.yml`: **Installs rbenv/ruby** globally so you can run Mastodon (it's a Ruby on Rails app)
 - `user.yml`: **Adds a user to run Mastodon with** since you shouldn't be running Mastodon under a priviledged account.
 
-### Postgres
+### postgres
 
-This role installs PostgresSQL, adds a database (named `mastodon_development` by default) and a user (named `mastodon` by default). For connecting to the database it can either use a local socket by setting the variable `mastodon_db_unix_socket` to the directory the Postgres socket lives in (`/var/run/postgresql` by default under Ubuntu 16.04) or a remote PostgreSQL instance you have installed somewhere else. You will than have to set the `mastodon_db_login_host` (IP address or hostname of database), `mastodon_db_port` (the port the database is accessible on; default `5432`), `mastodon_db_login_user` (the administrative user to connect to the database with) and `mastodon_db_login_password`.
+This role installs PostgresSQL, adds a database (named `mastodon_development` by default) and a user (named `mastodon` by default). For connecting to the database it can either use a local socket by setting the variable `mastodon_db_login_unix_socket` to the directory the Postgres socket lives in (`/var/run/postgresql` by default under Ubuntu 16.04) or a remote PostgreSQL instance you have installed somewhere else. You will than have to set the `mastodon_db_login_host` (IP address or hostname of database), `mastodon_db_port` (the port the database is accessible on; default `5432`), `mastodon_db_login_user` (the administrative user to connect to the database with) and `mastodon_db_login_password`.
 
 **Examples**
 
@@ -67,13 +67,13 @@ $ ansible-playbook playbook -i <your-host-here>, -u <remote-user> --extra-vars="
 $ ansible-playbook playbook -i <your-host-here>, -u <remote-user> --extra-vars="mastodon_db_password=your-password mastodon_db_login_host=mastodon-db mastodon_db_port=5432 mastodon_db_login_user=your-admin-db-user mastodon_db_login_password=your-password"
 ```
 
-### Redis
+### redis
 
 This role installs the [Redis](https://redis.io) key-value store, used by Mastodon, and its client libraries.
 
 ## Testing
 
-Testing is done using [ServerSpec](https://www.serverspec.org). The tests are located in `spec/`.
+Testing is done using [ServerSpec](https://www.serverspec.org). The tests are located in `spec/`. The tests are incorporating a [rubocop](http://rubocop.readthedocs.io/en/latest/) run.
 
 ### CircleCI
 
@@ -92,4 +92,4 @@ This should provision a new instance within VirtualBox and run all the tests nec
 - Add a firewall/sysctl role for hardening
 - Add CentOS/RedHat/Amazon Linux support
 - Add LB role
-- Add role for actually installing Mastodon, including systemd service configurations
+- Add role for actually cloning/initializing Mastodon, including systemd service configurations

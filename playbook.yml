@@ -5,11 +5,11 @@
     - "vars/common.yml"
     - ["vars/{{ ansible_os_family|lower }}_vars.yml"]
   roles:
-    - basic
+    - web
   environment:
     RBENV_ROOT: "{{ rbenv_home }}"
   tags:
-    - basic
+    - web
 
 - hosts: all
   vars_files:

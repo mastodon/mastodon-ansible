@@ -1,5 +1,5 @@
 ubuntu_codename: "xenial"
-bash_configuration: ".bashrc"
+mastodon_db_login_unix_socket: '/var/run/postgresql'
 
 packages:
   - package: "libssl-dev"
