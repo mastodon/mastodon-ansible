@@ -1,0 +1,15 @@
+---
+
+- docker_service:
+    project_name: redis
+    definition:
+      version: "2.3"
+      services:
+        redis:
+          image: redis:4.0-alpine
+          networks:
+            - "{{ mastodon_docker_network }}"
+          restart: on-failure
+      networks:
+        "{{ mastodon_docker_network }}":
+          external: true

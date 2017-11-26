@@ -1,0 +1,22 @@
+{{ local_domain }} {
+  root /mastodon/live/public
+  gzip
+
+  errors {
+    * 500.html
+  }
+
+  proxy / localhost:3000 {
+    transparent
+    websocket
+  }
+
+  proxy /api/v1/streaming streaming:4000 {
+    transparent
+    websocket
+  }
+
+  tls {{ lets_encrypt_email_address }} {
+    protocols tls1.2
+  }
+}

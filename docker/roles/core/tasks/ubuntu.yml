@@ -1,0 +1,26 @@
+---
+
+- name: Install required packages for HTTPS repositories
+  apt: name={{ item.package }} state=present update_cache=yes cache_valid_time=3600
+  become: yes
+  with_items:
+    - { package: apt-transport-https }
+    - { package: ca-certificates }
+
+- name: Add Docker repository for Ubuntu
+  apt_key: id={{ item.id }} url={{ item.url }} state=present
+  become: yes
+  with_items:
+    - { id: "9DC858229FC7DD38854AE2D88D81803C0EBFCD88", url: "https://download.docker.com/linux/ubuntu/gpg" }
+
+- name: Install Docker repository
+  apt_repository: repo={{ item.repo }} state=present
+  become: yes
+  with_items:
+    - { repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable" }
+
+- name: Run apt update
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  become: yes

@@ -1,0 +1,9 @@
+install_packages:
+  - package: "docker-ce"
+  - package: "python-pip"
+  - package: "python-setuptools"
+
+uninstall_packages:
+  - package: "docker-engine"
+  - package: "docker"
+  - package: "dockerio"

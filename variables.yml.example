@@ -1,0 +1,75 @@
+# Mastodon setup
+local_domain: example.com
+local_https: false
+# web_domain: mastodon.example.com
+# alternate_domains: example1.com,example2.com
+# single_user_mode: true
+default_locale: en
+# paperclip_root_path: /var/lib/mastodon/public-system
+# paperclip_root_url: /system
+# prepared_statements: false
+
+# Redis
+redis_host: redis
+redis_port: 6379
+
+# Postgres
+db_host: db
+db_user: mastodon
+db_name: mastodon
+db_pass: CHANGEME
+db_port: 5432
+
+# Secrets
+paperclip_secret: CHANGEME
+secret_key_base: CHANGEME
+otp_secret: CHANGEME
+vapid_private_key: CHANGEME
+vapid_public_key: CHANGEME
+
+# Email
+# email_domain_blacklist: example1.com|example2.de|etc
+# email_domain_whitelist: example1.com|example2.de|etc
+smtp_server: smtp.example.com
+smtp_port: 587
+smtp_login:
+smtp_password:
+smtp_from_address: notifications@example.com
+smtp_domain:
+smtp_delivery_method: smtp
+smtp_auth_method: plain
+# smtp_ca_file: /etc/ssl/certs/ca-certificates.crt
+# smtp_openssl_verify_mode: peer
+# smtp_enable_starttls_auto: true
+# smtp_tls: true
+
+# CDN
+# cdn_host: https://assets.example.com
+# s3_cloudfront_host:
+
+# S3
+s3_enabled: false
+s3_bucket:
+aws_access_key_id:
+aws_secret_access_key:
+s3_region:
+s3_protocol: https
+s3_hostname: 192.168.1.123:9000
+s3_endpoint:
+s3_signature_version:
+
+swift_enabled: false
+swift_username:
+swift_tenant:
+swift_password:
+swift_auth_url:
+swift_container:
+swift_object_url:
+swift_region:
+swift_domain_name:
+swift_cache_ttl:
+
+# Streaming API
+streaming_api_base_url:
+streaming_cluster_num: 1
+# vim: ft=yaml

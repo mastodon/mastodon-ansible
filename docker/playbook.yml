@@ -1,0 +1,17 @@
+---
+
+- name: Bootstrapping
+  gather_facts: False
+  hosts: all
+  roles:
+    - init
+
+- hosts: all
+  vars_files:
+    - "vars/common.yml"
+    - ["vars/{{ ansible_distribution|lower }}_vars.yml"]
+  roles:
+    - core
+  tags:
+    - core
+    - docker

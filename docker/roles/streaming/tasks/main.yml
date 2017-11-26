@@ -1,0 +1,18 @@
+---
+
+- docker_service:
+    project_name: streaming
+    definition:
+      version: "2.3"
+      services:
+        streaming:
+          image: "moritzheiber/mastodon-docker"
+          networks:
+            - "{{ mastodon_docker_network }}"
+          command: npm run start
+          restart: on-failure
+          env_file: /mastodon/.env
+      networks:
+        "{{ mastodon_docker_network }}":
+          external: true
+  notify: "restart caddy webserver"

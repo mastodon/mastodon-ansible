@@ -1,0 +1,20 @@
+---
+
+- docker_service:
+    project_name: db
+    definition:
+      version: "2.3"
+      services:
+        db:
+          image: postgresql:9.6-alpine
+          networks:
+            - "{{ mastodon_docker_network }}"
+          restart: on-failure
+          env_file: /mastodon/.env
+          environment:
+            - POSTGRES_USER: "{{ db_user }}"
+            - POSTGRES_PASSWORD: "{{ db_password }}"
+            - POSTGRES_DB: "{{ db_name }}"
+      networks:
+        "{{ mastodon_docker_network }}":
+          external: true

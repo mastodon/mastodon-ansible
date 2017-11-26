@@ -1,0 +1,48 @@
+---
+
+- import_tasks: ubuntu.yml
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Install docker-compose
+  get_url:
+    url: "https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-Linux-x86_64"
+    dest: "/usr/bin/docker-compose"
+    sha256sum: "{{ docker_compose_hash }}"
+    mode: 0755
+  become: yes
+
+- name: Install Docker packages
+  package:
+    name: "{{ item.package }}"
+    state: latest
+  become: yes
+  register: docker_packages
+  with_items: "{{ install_packages }}"
+
+- name: Install Python packages
+  pip:
+    name: "{{ item.package }}"
+    state: latest
+  with_items: "{{ install_python_packages }}"
+
+- name: Uninstall Python packages
+  pip:
+    name: "{{ item.package }}"
+    state: absent
+  with_items: "{{ uninstall_python_packages }}"
+
+- name: Install docker-compose Python
+  pip:
+    name: docker-compose
+    version: 1.17.0rc1
+
+- name: Check for existing network
+  raw: "docker network inspect {{ mastodon_docker_network }}"
+  register: docker_network
+  ignore_errors: True
+  become: yes
+
+- name: Create main docker network
+  raw: "docker network create -d bridge {{ mastodon_docker_network }}"
+  when: docker_network|failed
+  become: yes

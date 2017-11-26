@@ -1,0 +1,26 @@
+---
+
+- name: Check if Python is installed
+  raw: command -v python
+  register: python_installed
+  ignore_errors: True
+
+- name: Check if yum is installed
+  raw: command -v yum
+  register: yum_installed
+  ignore_errors: True
+
+- name: Check if apt is installed
+  raw: command -v apt
+  register: apt_installed
+  ignore_errors: True
+
+- name: Bootstrap Python on Amazon Linux
+  raw: yum update && yum install -y python27
+  when: python_installed|failed and yum_installed|succeeded
+  become: yes
+
+- name: Bootstrap Python on Ubuntu Linux
+  raw: apt update && apt install -y python
+  when: python_installed|failed and apt_installed|succeeded
+  become: yes

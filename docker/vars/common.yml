@@ -1,0 +1,12 @@
+ansible_python_interpreter: "/usr/bin/python2"
+docker_compose_version: "1.16.1"
+docker_compose_hash: "1804b0ce6596efe707b9cab05d74b161833ed503f0535a937dd5d17bea8fc50a"
+mastodon_docker_image: "moritzheiber/mastodon-docker"
+mastodon_docker_network: "mastodon_network"
+
+install_python_packages:
+  - package: "docker"
+
+uninstall_python_packages:
+  - package: "docker-py"
+

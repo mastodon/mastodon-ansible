@@ -1,0 +1,17 @@
+---
+
+- docker_service:
+    project_name: sidekiq
+    definition:
+      version: "2.3"
+      services:
+        sidekiq:
+          image: "moritzheiber/mastodon-docker"
+          networks:
+            - "{{ mastodon_docker_network }}"
+          command: bundle exec sidekiq -q default -q mailers -q pull -q push
+          restart: on-failure
+          env_file: /mastodon/.env
+      networks:
+        "{{ mastodon_docker_network }}":
+          external: true
