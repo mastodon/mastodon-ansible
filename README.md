@@ -19,7 +19,11 @@ $ virtualenv env
 $ source env/bin/activate
 $ pip install -r requirements.txt
 ```
-## Running the playbook
+## Running the playbooks
+
+### Bare
+
+This playbook is intended to be run on a "bare" (virtual) server, with the support for provisioning the Mastodon stack as well as a PostgresSQL and Redis database.
 
 ```sh
 $ ansible-playbook playbook.yml -i <your-host-here>, -u <remote-user> --extra-vars="<extra-variables>"
@@ -29,7 +33,7 @@ The playbook is using `become` for some of its tasks, hence the user you connect
 
 _Note: This assumes you're within the virtualenv already._
 
-## Roles
+#### Roles
 
 By default, the playbook runs all of the roles defined here in sequence. You can skip any of them by specifying `--skip-tags=<role-name>`.
 
@@ -41,7 +45,7 @@ Skipping the `postgres` role:
 $ ansible-playbook playbook.yml --skip-tags=postgres -i <your-host>, -u <your-user>
 ```
 
-### web
+##### web
 
 This role contains the following tasks:
 
@@ -50,7 +54,7 @@ This role contains the following tasks:
 - `ruby.yml`: **Installs rbenv/ruby** globally so you can run Mastodon (it's a Ruby on Rails app)
 - `user.yml`: **Adds a user to run Mastodon with** since you shouldn't be running Mastodon under a priviledged account.
 
-### postgres
+##### postgres
 
 This role installs PostgresSQL, adds a database (named `mastodon_development` by default) and a user (named `mastodon` by default). For connecting to the database it can either use a local socket by setting the variable `mastodon_db_login_unix_socket` to the directory the Postgres socket lives in (`/var/run/postgresql` by default under Ubuntu 16.04) or a remote PostgreSQL instance you have installed somewhere else. You will than have to set the `mastodon_db_login_host` (IP address or hostname of database), `mastodon_db_port` (the port the database is accessible on; default `5432`), `mastodon_db_login_user` (the administrative user to connect to the database with) and `mastodon_db_login_password`.
 
@@ -67,9 +71,13 @@ $ ansible-playbook playbook -i <your-host-here>, -u <remote-user> --extra-vars="
 $ ansible-playbook playbook -i <your-host-here>, -u <remote-user> --extra-vars="mastodon_db_password=your-password mastodon_db_login_host=mastodon-db mastodon_db_port=5432 mastodon_db_login_user=your-admin-db-user mastodon_db_login_password=your-password"
 ```
 
-### redis
+###### redis
 
 This role installs the [Redis](https://redis.io) key-value store, used by Mastodon, and its client libraries.
+
+### Docker
+
+FIXME
 
 ## Testing
 
@@ -82,10 +90,10 @@ This repository is regularly running tests using CircleCI. Its configuration can
 ### Local testing
 
 ```sh
-$ vagrant up
+$ vagrant up bare|docker
 ```
 
-This should provision a new instance within VirtualBox and run all the tests necessary to verify the Ansible playbook is valid.
+This should provision a new instance within VirtualBox and run all the tests necessary to verify the Ansible playbook is valid. By default it runs the Docker provisioning.
 
 # TODO
 

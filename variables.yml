@@ -32,12 +32,12 @@ vapid_public_key: CHANGEME
 # email_domain_whitelist: example1.com|example2.de|etc
 smtp_server: smtp.example.com
 smtp_port: 587
-smtp_login:
-smtp_password:
+smtp_login: ""
+smtp_password: ""
 smtp_from_address: notifications@example.com
-smtp_domain:
-smtp_delivery_method: smtp
-smtp_auth_method: plain
+# smtp_domain:
+# smtp_delivery_method: smtp
+# smtp_auth_method: plain
 # smtp_ca_file: /etc/ssl/certs/ca-certificates.crt
 # smtp_openssl_verify_mode: peer
 # smtp_enable_starttls_auto: true
@@ -49,27 +49,27 @@ smtp_auth_method: plain
 
 # S3
 s3_enabled: false
-s3_bucket:
-aws_access_key_id:
-aws_secret_access_key:
-s3_region:
-s3_protocol: https
-s3_hostname: 192.168.1.123:9000
-s3_endpoint:
-s3_signature_version:
+# s3_bucket:
+# aws_access_key_id:
+# aws_secret_access_key:
+# s3_region:
+# s3_protocol: https
+# s3_hostname: 192.168.1.123:9000
+# s3_endpoint:
+# s3_signature_version:
 
 swift_enabled: false
-swift_username:
-swift_tenant:
-swift_password:
-swift_auth_url:
-swift_container:
-swift_object_url:
-swift_region:
-swift_domain_name:
-swift_cache_ttl:
+# swift_username:
+# swift_tenant:
+# swift_password:
+# swift_auth_url:
+# swift_container:
+# swift_object_url:
+# swift_region:
+# swift_domain_name:
+# swift_cache_ttl:
 
 # Streaming API
-streaming_api_base_url:
-streaming_cluster_num: 1
+# streaming_api_base_url:
+# streaming_cluster_num: 1
 # vim: ft=yaml
