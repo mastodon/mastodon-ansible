@@ -34,13 +34,14 @@
     name: "{{ mastodon_db }}"
     login_unix_socket: "{{ mastodon_db_login_unix_socket }}"
   register: create_local_db
-  when: create_remote_db|skipped
+  when: create_remote_db is skipped
 
 - name: Create database user {{ mastodon_db_user }}
   postgresql_user:
     db: "{{ mastodon_db }}"
     name: "{{ mastodon_db_user }}"
     password: "{{ mastodon_db_password }}"
+    encrypted: true
     login_unix_socket: "{{ mastodon_db_login_unix_socket }}"
     role_attr_flags: CREATEDB
-  when: create_remote_db_user|skipped
+  when: create_remote_db_user is skipped

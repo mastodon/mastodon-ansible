@@ -44,5 +44,5 @@
 
 - name: Create main docker network
   raw: "docker network create -d bridge {{ mastodon_docker_network }}"
-  when: docker_network|failed
+  when: docker_network is failed
   become: yes

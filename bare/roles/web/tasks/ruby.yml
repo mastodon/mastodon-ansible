@@ -32,7 +32,7 @@
   command: make
   args:
     chdir: "{{ rbenv_home }}/src"
-  when: rbenv_configure|succeeded
+  when: rbenv_configure is succeeded
 
 - name: Update profile settings
   copy:
@@ -54,7 +54,7 @@
   shell: "{{ rbenv_home }}/bin/rbenv install {{ ruby_version }}"
   args:
     executable: /bin/bash
-  when: ruby_installed|failed
+  when: ruby_installed is failed
 
 - name: Set the default Ruby version to {{ ruby_version }}
   shell: "{{ rbenv_home }}/bin/rbenv global {{ ruby_version }}"
@@ -67,4 +67,4 @@
     executable: "{{ rbenv_home }}/shims/gem"
     state: latest
     user_install: false
-  when: default_ruby_version|succeeded
+  when: default_ruby_version is succeeded
