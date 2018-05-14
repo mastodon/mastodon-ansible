@@ -17,10 +17,10 @@
 
 - name: Bootstrap Python on Amazon Linux
   raw: yum update && yum install -y python27
-  when: python_installed|failed and yum_installed|succeeded
+  when: python_installed is failed and yum_installed is succeeded
   become: yes
 
 - name: Bootstrap Python on Ubuntu Linux
   raw: apt update && apt install -y python
-  when: python_installed|failed and apt_installed|succeeded
+  when: python_installed is failed and apt_installed is succeeded
   become: yes
