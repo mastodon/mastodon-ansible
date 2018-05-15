@@ -45,9 +45,7 @@
 - name: Check if the Ruby version is already installed
   shell: "{{ rbenv_home }}/bin/rbenv versions | grep -q {{ ruby_version }}"
   register: ruby_installed
-  changed_when: ruby_installed is false
   ignore_errors: yes
-  failed_when: ruby_installed is false
   check_mode: no
 
 - name: Install Ruby {{ ruby_version }}
