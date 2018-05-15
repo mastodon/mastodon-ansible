@@ -4,7 +4,7 @@ jobs:
     working_directory: /home/ubuntu/mastodon-ansible
     docker:
       - image: ubuntu:xenial
-      - image: postgres:9.5.5
+      - image: postgres:10
         environment:
           POSTGRES_USER: mastodon
           POSTGRES_DB: mastodon_development
@@ -24,7 +24,7 @@ jobs:
           name: Run Ansible playbook
           command: |
             source env/bin/activate
-            ansible-playbook playbook.yml -v --connection=local -i localhost, --extra-vars="@templates/secrets.yml.tpl" --extra-vars="mastodon_db_login_user=mastodon mastodon_db_login_host=localhost mastodon_db_login_password=CHANGEME"
+            ansible-playbook bare/playbook.yml -v --connection=local -i localhost, --extra-vars="@templates/secrets.yml.tpl" --extra-vars="mastodon_db_login_user=mastodon mastodon_db_login_host=localhost mastodon_db_login_password=CHANGEME"
 
       - run:
           name: Run ServerSpec tests
