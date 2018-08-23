@@ -20,10 +20,10 @@ describe 'Ansible Debian target' do
     end
 
     describe command('ruby -v') do
-      its(:stdout) { should match(/2\.4\.1p111/) }
+      its(:stdout) { should match(/2\.5\.1/) }
     end
 
-    describe file('/usr/bin/node') do
+    describe file('/usr/bin/nodejs') do
       it { should be_symlink }
     end
 
