@@ -41,7 +41,7 @@
     db: "{{ mastodon_db }}"
     name: "{{ mastodon_db_user }}"
     password: "{{ mastodon_db_password }}"
-    encrypted: true
+    encrypted: yes
     login_unix_socket: "{{ mastodon_db_login_unix_socket }}"
     role_attr_flags: CREATEDB
   when: create_remote_db_user is skipped
