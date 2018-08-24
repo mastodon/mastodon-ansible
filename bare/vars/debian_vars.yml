@@ -1,20 +1,40 @@
-ubuntu_codename: "xenial"
+ubuntu_codename: "bionic"
 mastodon_db_login_unix_socket: '/var/run/postgresql'
 
 packages:
-  - package: "libssl-dev"
-  - package: "zlib1g-dev"
-  - package: "git-core"
+  - package: "autoconf"
+  - package: "bison"
   - package: "build-essential"
+  - package: "curl"
+  - package: "cron"
+  - package: "ffmpeg"
+  - package: "file"
+  - package: "g++"
+  - package: "gcc"
+  - package: "git"
+  - package: "imagemagick"
+  - package: "libffi-dev"
+  - package: "libgdbm-dev"
+  - package: "libgdbm5"
+  - package: "libicu-dev"
+  - package: "libidn11-dev"
+  - package: "libncurses5-dev"
+  - package: "libpq-dev"
+  - package: "libprotobuf-dev"
+  - package: "libreadline-dev"
+  - package: "libssl-dev"
   - package: "libxml2-dev"
   - package: "libxslt1-dev"
-  - package: "imagemagick"
+  - package: "libyaml-dev"
+  - package: "nginx"
   - package: "nodejs"
-  - package: "yarn"
-  - package: "libreadline-dev"
-  - package: "ffmpeg"
-  - package: "curl"
+  - package: "pkg-config"
+  - package: "protobuf-compiler"
   - package: "sudo"
+  - package: "systemd"
+  - package: "unattended-upgrades"
+  - package: "yarn"
+  - package: "zlib1g-dev"
 
 postgres:
   packages:
@@ -22,6 +42,7 @@ postgres:
     - package: "postgresql"
     - package: "postgresql-contrib"
     - package: "python-psycopg2"
+    - package: "sudo"
 
 redis:
   packages:

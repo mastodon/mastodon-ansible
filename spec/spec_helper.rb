@@ -11,7 +11,7 @@ module Helpers
       password: 'CHANGEME'
     )
 
-    res = pg.query('CREATE TABLE test (v varchar(20));')
+    res = pg.query('CREATE TABLE test (v varchar(20)); DROP TABLE test;')
     res.result_status == PG::PGRES_COMMAND_OK
   ensure
     pg.close

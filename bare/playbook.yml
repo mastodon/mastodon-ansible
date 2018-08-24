@@ -11,17 +11,6 @@
     - "vars/common.yml"
     - ["vars/{{ ansible_os_family|lower }}_vars.yml"]
   roles:
-    - web
-  environment:
-    RBENV_ROOT: "{{ rbenv_home }}"
-  tags:
-    - web
-
-- hosts: all
-  vars_files:
-    - "vars/common.yml"
-    - ["vars/{{ ansible_os_family|lower }}_vars.yml"]
-  roles:
     - postgres
   tags:
     - postgres
@@ -34,3 +23,12 @@
     - redis
   tags:
     - redis
+
+- hosts: all
+  vars_files:
+    - "vars/common.yml"
+    - ["vars/{{ ansible_os_family|lower }}_vars.yml"]
+  roles:
+    - web
+  tags:
+    - web

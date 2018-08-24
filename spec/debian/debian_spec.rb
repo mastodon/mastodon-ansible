@@ -12,11 +12,11 @@ describe 'Ansible Debian target' do
       it { should have_login_shell '/bin/bash' }
     end
 
-    describe file('/etc/profile.d/rbenv.sh') do
+    describe file('/home/mastodon/.bashrc') do
       it { should exist }
       its(:content) { should match(/rbenv init -/) }
-      its(:content) { should match(/RBENV_ROOT/) }
       its(:content) { should match(/PATH=/) }
+      it { is_expected.to be_owned_by('mastodon') }
     end
 
     describe command('ruby -v') do
@@ -28,30 +28,46 @@ describe 'Ansible Debian target' do
     end
 
     %w[
-      apt-transport-https
-      ca-certificates
-      libssl-dev
-      zlib1g-dev
-      git-core
+      autoconf
+      bison
       build-essential
+      curl
+      ffmpeg
+      file
+      g++
+      gcc
+      git
+      imagemagick
+      libffi-dev
+      libgdbm-dev
+      libgdbm5
+      libicu-dev
+      libidn11-dev
+      libncurses5-dev
+      libpq-dev
+      libprotobuf-dev
+      libreadline-dev
+      libssl-dev
       libxml2-dev
       libxslt1-dev
-      imagemagick
+      libyaml-dev
+      nginx
       nodejs
-      yarn
-      libreadline-dev
-      ffmpeg
-      curl
+      pkg-config
+      protobuf-compiler
       sudo
+      yarn
+      zlib1g-dev
     ].each do |p|
       describe package(p) do
         it { should be_installed }
       end
     end
 
-    describe file('/usr/bin/ruby-build') do
+    describe file('/home/mastodon/.rbenv/plugins/ruby-build/bin/ruby-build') do
       it { should exist }
       it { should be_executable }
+      it { is_expected.to be_owned_by('mastodon') }
     end
 
     describe command('ruby-build --version') do
@@ -59,7 +75,42 @@ describe 'Ansible Debian target' do
         its(:stdout) { should match(/ruby-build 20170405/) }
       end
     end
+
+    describe file('/home/mastodon/live') do
+      it { should exist }
+      it { is_expected.to be_directory }
+      it { is_expected.to be_owned_by('mastodon') }
+    end
+
+    describe file('/etc/systemd/system/mastodon-web.service') do
+      it { should exist }
+    end
+
+    describe file('/etc/systemd/system/mastodon-streaming.service') do
+      it { should exist }
+    end
+
+    describe file('/etc/systemd/system/mastodon-sidekiq.service') do
+      it { should exist }
+    end
+
+    describe cron do
+      it {
+        should have_entry('15 1 * * * cd /home/mastodon/live && ' \
+          'RAILS_ENV=production /home/mastodon/.rbenv/shims/bundle ' \
+          'exec rake mastodon:media:remove_remote').with_user('mastodon')
+      }
+    end
+
+    describe file('/etc/nginx/sites-available/mastodon.conf') do
+      it { should exist }
+    end
+
+    describe file('/etc/nginx/sites-enabled/mastodon.conf') do
+      it { should be_symlink }
+    end
   end
+
   context 'postgres role' do
     describe port(5432) do
       it { should be_listening }

@@ -1,0 +1,23 @@
+---
+
+- name: Copy nginx config
+  template: 
+    src: ../files/nginx/mastodon.conf.j2
+    dest: /etc/nginx/sites-available/mastodon.conf
+  when:
+    - mastodon_host is defined
+  become: true
+
+- name: Symlink enabled site
+  file:
+    src: "/etc/nginx/sites-available/mastodon.conf"
+    dest: "/etc/nginx/sites-enabled/mastodon.conf"
+    state: link
+  when:
+    - mastodon_host is defined
+  become: true
+
+# TODO: Enable this after letsencrypt is done
+#- name: Reload nginx
+#  command: "systemctl reload nginx"
+#  become: true
