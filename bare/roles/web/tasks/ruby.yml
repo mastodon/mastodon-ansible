@@ -3,66 +3,58 @@
 - name: Clone rbenv
   git:
     repo: "https://github.com/rbenv/rbenv.git"
-    dest: "{{ rbenv_home }}"
+    dest: "~/.rbenv"
     clone: true
     version: "{{ rbenv_version }}"
 
 - name: Clone ruby-build
   git:
     repo: "https://github.com/rbenv/ruby-build.git"
-    dest: "/tmp/ruby-build"
+    dest: "~/.rbenv/plugins/ruby-build"
     clone: true
     version: "{{ ruby_build_version }}"
   register: ruby_build
 
 - name: Configure rbenv
-  shell: PREFIX="/usr" ./install.sh
-  args:
-    chdir: "/tmp/ruby-build"
-  register: rbenv_build_install
-  become: true
-
-- name: Configure rbenv
   command: ./configure
   args:
-    chdir: "{{ rbenv_home }}/src"
+    chdir: "~/.rbenv/src"
   register: rbenv_configure
 
 - name: Build rbenv
   command: make
   args:
-    chdir: "{{ rbenv_home }}/src"
+    chdir: "~/.rbenv/src"
   when: rbenv_configure is succeeded
 
 - name: Update profile settings
   copy:
-    dest: "/etc/profile.d/rbenv.sh"
+    dest: "~/.bashrc"
     content: |
-      export PATH="{{ rbenv_home }}/bin:${PATH}"
-      export RBENV_ROOT="{{ rbenv_home }}"
+      export PATH="~/.rbenv/bin:${PATH}"
       eval "$(rbenv init -)"
 
 - name: Check if the Ruby version is already installed
-  shell: "{{ rbenv_home }}/bin/rbenv versions | grep -q {{ ruby_version }}"
+  shell: "~/.rbenv/bin/rbenv versions | grep -q {{ ruby_version }}"
   register: ruby_installed
   ignore_errors: yes
   check_mode: no
 
 - name: Install Ruby {{ ruby_version }}
-  shell: "{{ rbenv_home }}/bin/rbenv install {{ ruby_version }}"
+  shell: "~/.rbenv/bin/rbenv install {{ ruby_version }}"
   args:
     executable: /bin/bash
   when: ruby_installed is failed
 
 - name: Set the default Ruby version to {{ ruby_version }}
-  shell: "{{ rbenv_home }}/bin/rbenv global {{ ruby_version }}"
+  shell: "~/.rbenv/bin/rbenv global {{ ruby_version }}"
   args:
     executable: /bin/bash
   register: default_ruby_version
 
 - gem:
     name: bundler
-    executable: "{{ rbenv_home }}/shims/gem"
+    executable: "~/.rbenv/shims/gem"
     state: latest
     user_install: false
   when: default_ruby_version is succeeded

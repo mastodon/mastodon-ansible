@@ -1,23 +1,25 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    ast (2.3.0)
+    ast (2.4.0)
     diff-lcs (1.3)
     docker-api (1.33.4)
       excon (>= 0.38.0)
       json
     excon (0.55.0)
+    jaro_winkler (1.5.1)
     json (2.1.0)
     multi_json (1.12.1)
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
     net-ssh (4.1.0)
     net-telnet (0.1.1)
-    parser (2.4.0.0)
-      ast (~> 2.2)
+    parallel (1.12.1)
+    parser (2.5.1.2)
+      ast (~> 2.4.0)
     pg (0.20.0)
-    powerpack (0.1.1)
-    rainbow (2.2.1)
+    powerpack (0.1.2)
+    rainbow (3.0.0)
     rake (12.0.0)
     rspec (3.5.0)
       rspec-core (~> 3.5.0)
@@ -35,13 +37,15 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.5.0)
     rspec-support (3.5.0)
-    rubocop (0.48.1)
-      parser (>= 2.3.3.1, < 3.0)
+    rubocop (0.58.2)
+      jaro_winkler (~> 1.5.1)
+      parallel (~> 1.10)
+      parser (>= 2.5, != 2.5.1.1)
       powerpack (~> 0.1)
-      rainbow (>= 1.99.1, < 3.0)
+      rainbow (>= 2.2.2, < 4.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (~> 1.0, >= 1.0.1)
-    ruby-progressbar (1.8.1)
+    ruby-progressbar (1.10.0)
     serverspec (2.38.0)
       multi_json
       rspec (~> 3.0)
@@ -53,7 +57,7 @@ GEM
       net-ssh (>= 2.7, < 5.0)
       net-telnet
       sfl
-    unicode-display_width (1.2.1)
+    unicode-display_width (1.4.0)
 
 PLATFORMS
   ruby
@@ -66,4 +70,4 @@ DEPENDENCIES
   serverspec
 
 BUNDLED WITH
-   1.14.6
+   1.16.4

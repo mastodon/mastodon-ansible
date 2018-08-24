@@ -1,5 +1,4 @@
 ---
-
 - include: repositories.yml
   when: os_family == "debian"
 
@@ -7,3 +6,8 @@
 - include: user.yml
 - include: ruby.yml
   become: true
+  become_user: mastodon
+- include: mastodon.yml
+  become: true
+  become_user: mastodon
+- include: nginx.yml

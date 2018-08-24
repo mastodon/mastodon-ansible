@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: /home/ubuntu/mastodon-ansible
     docker:
-      - image: ubuntu:xenial
+      - image: ubuntu:bionic
       - image: postgres:10
         environment:
           POSTGRES_USER: mastodon
@@ -24,14 +24,15 @@ jobs:
           name: Run Ansible playbook
           command: |
             source env/bin/activate
-            ansible-playbook bare/playbook.yml -v --connection=local -i localhost, --extra-vars="@templates/secrets.yml.tpl" --extra-vars="mastodon_db_login_user=mastodon mastodon_db_login_host=localhost mastodon_db_login_password=CHANGEME"
+            ansible-playbook bare/playbook.yml -v --connection=local -i localhost, --extra-vars="@templates/secrets.yml.tpl" --extra-vars="mastodon_db_login_user=mastodon mastodon_db_login_host=localhost mastodon_db_login_password=CHANGEME mastodon_host=example.com"
 
       - run:
           name: Run ServerSpec tests
           environment:
-            - RBENV_ROOT: "/usr/lib/rbenv"
+            - RBENV_ROOT: "/home/mastodon/.rbenv"
           command: |
-            source /etc/profile.d/rbenv.sh
-            bundle install --path vendor/bundle
+            export PATH="/home/mastodon/.rbenv/bin:${PATH}"
+            eval "$(rbenv init -)"
+            bundle install
             bundle exec rubocop
             bundle exec rspec
