@@ -4,5 +4,4 @@
     createhome: true
     shell: /bin/bash
     home: "{{ mastodon_home }}"
-  become: true
 

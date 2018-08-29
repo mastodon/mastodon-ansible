@@ -1,0 +1,22 @@
+---
+
+- name: Allow ssh through firewall
+  ufw:
+    proto: tcp
+    port: 22
+    rule: allow
+- name: Set ufw policy
+  ufw: 
+    state: enabled 
+    direction: incoming 
+    policy: deny
+- name: Allow nginx firewall
+  ufw: 
+    proto: tcp
+    port: 80
+    rule: allow
+- name: Allow nginx ssl firewall
+  ufw: 
+    proto: tcp
+    port: 443
+    rule: allow
