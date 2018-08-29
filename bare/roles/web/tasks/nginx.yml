@@ -6,8 +6,7 @@
     dest: /etc/nginx/sites-available/mastodon.conf
   when:
     - mastodon_host is defined
-  become: true
-
+  
 - name: Symlink enabled site
   file:
     src: "/etc/nginx/sites-available/mastodon.conf"
@@ -15,7 +14,6 @@
     state: link
   when:
     - mastodon_host is defined
-  become: true
 
 # TODO: Enable this after letsencrypt is done
 #- name: Reload nginx

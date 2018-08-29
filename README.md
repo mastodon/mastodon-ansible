@@ -127,7 +127,7 @@ FIXME
 
 ## Testing
 
-Testing is done using [ServerSpec](https://www.serverspec.org). The tests are located in `spec/`. The tests are incorporating a [rubocop](http://rubocop.readthedocs.io/en/latest/) run.
+Testing is done using [ServerSpec](https://serverspec.org). The tests are located in `spec/`. The tests are incorporating a [rubocop](http://rubocop.readthedocs.io/en/latest/) run.
 
 ### CircleCI
 
@@ -143,7 +143,6 @@ This should provision a new instance within VirtualBox and run all the tests nec
 
 # TODO
 
-- Add a firewall/sysctl role for hardening
 - Add letsencrypt
 - Add CentOS/RedHat/Amazon Linux support
 - Add LB role

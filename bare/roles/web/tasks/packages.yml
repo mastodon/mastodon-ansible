@@ -7,11 +7,9 @@
     cache_valid_time: 3600
     state: latest
     install_recommends: no
-  become: yes
   with_items: "{{ packages }}"
 
 - name: nodejs alternative
-  become: yes
   alternatives:
     name: node
     link: /usr/bin/node

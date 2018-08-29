@@ -23,6 +23,9 @@ Vagrant.configure('2') do |config|
     bare.vm.provision 'shell' do |shell|
       shell.privileged = false
       shell.inline = <<SHELL
+      # Ruby is installed as mastodon user, that user has no permission to run ufw
+      # because of that we do this little workaround
+      sudo ufw status 2>&1 > /home/vagrant/ufw_result.txt
       sudo -u mastodon -i /bin/sh <<MASTODON_BLOCK
       cd /home/vagrant
       bundle install

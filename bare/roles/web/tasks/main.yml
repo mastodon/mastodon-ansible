@@ -3,7 +3,11 @@
   when: os_family == "debian"
 
 - include: packages.yml
+  become: true
+- include: ufw.yml
+  become: true
 - include: user.yml
+  become: true
 - include: ruby.yml
   become: true
   become_user: mastodon
@@ -11,3 +15,4 @@
   become: true
   become_user: mastodon
 - include: nginx.yml
+  become: true

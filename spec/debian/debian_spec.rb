@@ -71,9 +71,7 @@ describe 'Ansible Debian target' do
     end
 
     describe command('ruby-build --version') do
-      pending('https://github.com/rbenv/ruby-build/issues/1078') do
-        its(:stdout) { should match(/ruby-build 20170405/) }
-      end
+      its(:stdout) { should match(/ruby-build 20180424/) }
     end
 
     describe file('/home/mastodon/live') do
@@ -108,6 +106,23 @@ describe 'Ansible Debian target' do
 
     describe file('/etc/nginx/sites-enabled/mastodon.conf') do
       it { should be_symlink }
+    end
+
+    describe file('/home/vagrant/ufw_result.txt') do
+      its(:content) { should match(/Status: active/) }
+
+      expected_rules = [
+        %r{22\/tcp \s* ALLOW \s* Anywhere},
+        %r{80\/tcp \s* ALLOW \s* Anywhere},
+        %r{443\/tcp \s* ALLOW \s* Anywhere},
+        %r{22\/tcp \(v6\) \s* ALLOW \s* Anywhere \(v6\)},
+        %r{80\/tcp \(v6\) \s* ALLOW \s* Anywhere \(v6\)},
+        %r{443\/tcp \(v6\) \s* ALLOW  \s* Anywhere \(v6\)}
+      ]
+
+      expected_rules.each do |r|
+        its(:content) { should match(r) }
+      end
     end
   end
 

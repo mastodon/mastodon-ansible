@@ -32,6 +32,7 @@ packages:
   - package: "protobuf-compiler"
   - package: "sudo"
   - package: "systemd"
+  - package: "ufw"
   - package: "unattended-upgrades"
   - package: "yarn"
   - package: "zlib1g-dev"
