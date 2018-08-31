@@ -6,6 +6,8 @@
   become: true
 - include: ufw.yml
   become: true
+  tags:
+    - firewall
 - include: user.yml
   become: true
 - include: ruby.yml
