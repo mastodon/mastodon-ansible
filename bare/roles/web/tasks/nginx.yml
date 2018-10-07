@@ -17,3 +17,5 @@
 
 - name: Reload nginx
   command: "systemctl reload nginx"
+  tags:
+    - systemd
