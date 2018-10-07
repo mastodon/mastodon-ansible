@@ -15,7 +15,5 @@
   when:
     - mastodon_host is defined
 
-# TODO: Enable this after letsencrypt is done
-#- name: Reload nginx
-#  command: "systemctl reload nginx"
-#  become: true
+- name: Reload nginx
+  command: "systemctl reload nginx"
