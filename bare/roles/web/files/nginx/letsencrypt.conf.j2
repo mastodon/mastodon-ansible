@@ -1,0 +1,8 @@
+# This starts a simple nginx for the letsencrypt acme challenge
+server {
+  listen 80;
+  listen [::]:80;
+  server_name {{ mastodon_host }}
+  root /home/mastodon/live/public;
+  location /.well-known/acme-challenge/ { allow all; }
+}

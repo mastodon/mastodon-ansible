@@ -16,5 +16,9 @@
 - include: mastodon.yml
   become: true
   become_user: mastodon
+- include: letsencrypt.yml
+  become: true
+  tags:
+    - letsencrypt 
 - include: nginx.yml
   become: true
