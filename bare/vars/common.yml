@@ -9,3 +9,4 @@ mastodon_path: "live"
 mastodon_db: "{{ mastodon_user }}_development"
 mastodon_db_port: 5432
 disable_hsts: "false"
+disable_letsencrypt: "false"
