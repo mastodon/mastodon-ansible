@@ -7,7 +7,7 @@ server {
   listen 80;
   listen [::]:80;
   server_name {{ mastodon_host }}
-  root /home/mastodon/live/public;
+  root {{ mastodon_home }}/{{ mastodon_path }}/public;
   # Useful for Let's Encrypt
   location /.well-known/acme-challenge/ { allow all; }
   location / { return 301 https://$host$request_uri; }
@@ -30,7 +30,7 @@ server {
   sendfile             on;
   client_max_body_size 8m;
 
-  root /home/mastodon/live/public;
+  root {{ mastodon_home }}/{{ mastodon_path }}/public;
 
   gzip on;
   gzip_disable "msie6";
