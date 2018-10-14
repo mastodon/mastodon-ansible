@@ -23,8 +23,10 @@ server {
   ssl_prefer_server_ciphers on;
   ssl_session_cache shared:SSL:10m;
 
+{% if disable_letsencrypt != "true" %}
   ssl_certificate     /etc/letsencrypt/live/{{ mastodon_host }}/fullchain.pem;
   ssl_certificate_key /etc/letsencrypt/live/{{ mastodon_host }}/privkey.pem;
+{% endif %}
 
   keepalive_timeout    70;
   sendfile             on;

@@ -9,9 +9,11 @@ Vagrant.configure('2') do |config|
       ansible.playbook = 'bare/playbook.yml'
       ansible.extra_vars = {
         mastodon_db_password: 'CHANGEME',
-        mastodon_host: 'example.com'
+        mastodon_host: 'example.com',
+        disable_letsencrypt: 'true'
       }
       ansible.verbose = true
+      ansible.skip_tags = 'letsencrypt'
     end
 
     %w[Gemfile Gemfile.lock spec .rspec].each do |file|
