@@ -3,6 +3,6 @@ server {
   listen 80;
   listen [::]:80;
   server_name {{ mastodon_host }}
-  root /home/mastodon/live/public;
+  root {{ mastodon_home }}/{{ mastodon_path }}/public;
   location /.well-known/acme-challenge/ { allow all; }
 }

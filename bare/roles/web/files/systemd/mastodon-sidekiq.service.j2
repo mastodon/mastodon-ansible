@@ -5,7 +5,7 @@ After=network.target
 [Service]
 Type=simple
 User=mastodon
-WorkingDirectory=/home/mastodon/live
+WorkingDirectory={{ mastodon_home }}/{{ mastodon_path }}
 Environment="RAILS_ENV=production"
 Environment="DB_POOL=5"
 ExecStart=/home/mastodon/.rbenv/shims/bundle exec sidekiq -c 5 -q default -q push -q mailers -q pull

@@ -2,42 +2,42 @@
 - name: Clone mastodon
   git:
     repo: "https://github.com/tootsuite/mastodon.git"
-    dest: "~/live"
+    dest: "~/{{mastodon_path}}"
     clone: true
 
 - name: Update to latest version
   shell: "git fetch; git checkout $(git tag -l | grep -v 'rc[0-9]*$' | sort -V | tail -n 1)"
   args:
-    chdir: "~/live"
+    chdir: "{{ mastodon_home }}/{{ mastodon_path }}"
 
 - name: Bundle install
   shell: "~/.rbenv/shims/bundle install -j$(getconf _NPROCESSORS_ONLN) --deployment --without development test"
   args:
-    chdir: "~/live"
+    chdir: "{{ mastodon_home }}/{{ mastodon_path }}"
 
 - name: Yarn install
   command: yarn install --pure-lockfile
   args:
-    chdir: "~/live"
+    chdir: "{{ mastodon_home }}/{{ mastodon_path }}"
 
 - name: Install systemd sidekiq Service Files
-  copy:
-    src: ../files/systemd/mastodon-sidekiq.service
-    dest: /etc/systemd/system/
+  template:
+    src: ../files/systemd/mastodon-sidekiq.service.j2
+    dest: /etc/systemd/system/mastodon-sidekiq.service
   become: true
   become_user: root
 
 - name: Install systemd web Service Files
-  copy:
-    src: ../files/systemd/mastodon-web.service
-    dest: /etc/systemd/system/
+  template:
+    src: ../files/systemd/mastodon-web.service.j2
+    dest: /etc/systemd/system/mastodon-web.service
   become: true
   become_user: root
 
 - name: Install systemd streaming Service Files
-  copy:
-    src: ../files/systemd/mastodon-streaming.service
-    dest: /etc/systemd/system/
+  template:
+    src: ../files/systemd/mastodon-streaming.service.j2
+    dest: /etc/systemd/system/mastodon-streaming.service
   become: true
   become_user: root
 
@@ -46,21 +46,21 @@
     name: "media cleanup"
     minute: "15"
     hour: "1"
-    job: "cd /home/mastodon/live && RAILS_ENV=production /home/mastodon/.rbenv/shims/bundle exec rake mastodon:media:remove_remote"
+    job: "cd {{ mastodon_home }}/{{ mastodon_path }} && RAILS_ENV=production /home/mastodon/.rbenv/shims/bundle exec rake mastodon:media:remove_remote"
 
-- stat: path=/home/mastodon/live/.env.production
+- stat: path={{ mastodon_home }}/{{ mastodon_path }}/.env.production
   register: production_config
 
 - name: Migrate database
   shell: "RAILS_ENV=production ~/.rbenv/shims/bundle exec rails db:migrate"
   args:
-    chdir: "~/live"
+    chdir: "{{ mastodon_home }}/{{ mastodon_path }}"
   when: production_config.stat.exists
 
 - name: Precompile assets
   shell: "RAILS_ENV=production ~/.rbenv/shims/bundle exec rails assets:precompile"
   args:
-    chdir: "~/live"
+    chdir: "{{ mastodon_home }}/{{ mastodon_path }}"
   when: production_config.stat.exists
 
 - name: Enable mastodon-web
