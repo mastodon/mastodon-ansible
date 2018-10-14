@@ -2,7 +2,7 @@
 - name: Clone mastodon
   git:
     repo: "https://github.com/tootsuite/mastodon.git"
-    dest: "~/{{mastodon_path}}"
+    dest: "{{ mastodon_home }}/{{mastodon_path}}"
     clone: true
 
 - name: Update to latest version
