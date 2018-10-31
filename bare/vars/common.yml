@@ -1,6 +1,6 @@
-ruby_version: 2.5.1
+ruby_version: 2.5.3
 rbenv_version: v1.1.1
-ruby_build_version: v20180424
+ruby_build_version: v20181019
 os_family: "{{ ansible_os_family|lower }}"
 mastodon_user: "mastodon"
 mastodon_home: "/home/{{ mastodon_user }}"
