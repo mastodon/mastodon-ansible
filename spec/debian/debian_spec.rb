@@ -20,7 +20,7 @@ describe 'Ansible Debian target' do
     end
 
     describe command('ruby -v') do
-      its(:stdout) { should match(/2\.5\.1/) }
+      its(:stdout) { should match(/2\.5\.3/) }
     end
 
     describe file('/usr/bin/nodejs') do
@@ -71,7 +71,7 @@ describe 'Ansible Debian target' do
     end
 
     describe command('ruby-build --version') do
-      its(:stdout) { should match(/ruby-build 20180424/) }
+      its(:stdout) { should match(/ruby-build 20181019/) }
     end
 
     describe file('/home/mastodon/live') do
