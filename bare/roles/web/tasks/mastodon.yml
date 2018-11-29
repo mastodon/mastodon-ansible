@@ -1,4 +1,3 @@
----
 - name: Clone mastodon
   git:
     repo: "https://github.com/tootsuite/mastodon.git"
@@ -11,7 +10,7 @@
     chdir: "{{ mastodon_home }}/{{ mastodon_path }}"
 
 - name: Bundle install
-  shell: "~/.rbenv/shims/bundle install -j$(getconf _NPROCESSORS_ONLN) --deployment --without development test"
+  shell: "~/.rbenv/shims/bundle install -j$(getconf _NPROCESSORS_ONLN) --deployment --with development --without test"
   args:
     chdir: "{{ mastodon_home }}/{{ mastodon_path }}"
 
@@ -46,7 +45,7 @@
     name: "media cleanup"
     minute: "15"
     hour: "1"
-    job: "cd {{ mastodon_home }}/{{ mastodon_path }} && RAILS_ENV=production /home/mastodon/.rbenv/shims/bundle exec rake mastodon:media:remove_remote"
+    job: "cd {{ mastodon_home }}/{{ mastodon_path }} && RAILS_ENV=production ./bin/tootctl media remove"
 
 - stat: path={{ mastodon_home }}/{{ mastodon_path }}/.env.production
   register: production_config
