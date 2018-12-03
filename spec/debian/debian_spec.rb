@@ -95,8 +95,7 @@ describe 'Ansible Debian target' do
     describe cron do
       it {
         should have_entry('15 1 * * * cd /home/mastodon/live && ' \
-          'RAILS_ENV=production /home/mastodon/.rbenv/shims/bundle ' \
-          'exec rake mastodon:media:remove_remote').with_user('mastodon')
+          'RAILS_ENV=production ./bin/tootctl media remove').with_user('mastodon')
       }
     end
 
