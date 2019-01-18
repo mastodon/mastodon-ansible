@@ -45,7 +45,7 @@
     name: "media cleanup"
     minute: "15"
     hour: "1"
-    job: "cd {{ mastodon_home }}/{{ mastodon_path }} && RAILS_ENV=production ./bin/tootctl media remove"
+    job: "/bin/bash -c 'export PATH="$HOME/.rbenv/bin:$PATH"; eval "$(rbenv init -)"; cd {{ mastodon_home }}/{{ mastodon_path }} && RAILS_ENV=production ./bin/tootctl media remove'"
 
 - stat: path={{ mastodon_home }}/{{ mastodon_path }}/.env.production
   register: production_config

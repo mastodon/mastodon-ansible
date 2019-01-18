@@ -94,8 +94,10 @@ describe 'Ansible Debian target' do
 
     describe cron do
       it {
-        should have_entry('15 1 * * * cd /home/mastodon/live && ' \
-          'RAILS_ENV=production ./bin/tootctl media remove')
+        should have_entry('15 1 * * * /bin/bash -c ' \
+          '\'export PATH="$HOME/.rbenv/bin:$PATH"; ' \
+          'eval "$(rbenv init -)"; cd /home/mastodon/live && ' \
+          'RAILS_ENV=production ./bin/tootctl media remove\'')
           .with_user('mastodon')
       }
     end

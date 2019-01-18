@@ -1,5 +1,4 @@
 ---
-
 - name: Clone rbenv
   git:
     repo: "https://github.com/rbenv/rbenv.git"
@@ -56,5 +55,4 @@
     name: bundler
     executable: "~/.rbenv/shims/gem"
     state: latest
-    user_install: false
   when: default_ruby_version is succeeded
