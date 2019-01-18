@@ -52,7 +52,7 @@
   register: default_ruby_version
 
 - name: Install bundler
-  shell: "~/.rbenv/shims/gem install bundler"
+  shell: 'export PATH="$HOME/.rbenv/bin:$PATH"; eval "$(rbenv init -)"; gem install bundler'
   args:
     executable: /bin/bash
   when: default_ruby_version is succeeded
