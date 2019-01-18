@@ -51,8 +51,8 @@
     executable: /bin/bash
   register: default_ruby_version
 
-- gem:
-    name: bundler
-    executable: "~/.rbenv/shims/gem"
-    state: latest
+- name: Install bundler
+  shell: "~/.rbenv/bin/gem install bundler"
+  args:
+    executable: /bin/bash
   when: default_ruby_version is succeeded
