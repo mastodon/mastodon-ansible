@@ -1,5 +1,4 @@
 ---
-
 - name: Clone rbenv
   git:
     repo: "https://github.com/rbenv/rbenv.git"
@@ -52,9 +51,8 @@
     executable: /bin/bash
   register: default_ruby_version
 
-- gem:
-    name: bundler
-    executable: "~/.rbenv/shims/gem"
-    state: latest
-    user_install: false
+- name: Install bundler
+  shell: 'export PATH="$HOME/.rbenv/bin:$PATH"; eval "$(rbenv init -)"; gem install bundler'
+  args:
+    executable: /bin/bash
   when: default_ruby_version is succeeded

@@ -20,7 +20,7 @@ describe 'Ansible Debian target' do
     end
 
     describe command('ruby -v') do
-      its(:stdout) { should match(/2\.5\.3/) }
+      its(:stdout) { should match(/2\.6\.0/) }
     end
 
     describe file('/usr/bin/nodejs') do
@@ -71,7 +71,7 @@ describe 'Ansible Debian target' do
     end
 
     describe command('ruby-build --version') do
-      its(:stdout) { should match(/ruby-build 20181019/) }
+      its(:stdout) { should match(/ruby-build 20181225/) }
     end
 
     describe file('/home/mastodon/live') do
@@ -94,9 +94,11 @@ describe 'Ansible Debian target' do
 
     describe cron do
       it {
-        should have_entry('15 1 * * * cd /home/mastodon/live && ' \
-          'RAILS_ENV=production /home/mastodon/.rbenv/shims/bundle ' \
-          'exec rake mastodon:media:remove_remote').with_user('mastodon')
+        should have_entry('15 1 * * * /bin/bash -c ' \
+          '\'export PATH="$HOME/.rbenv/bin:$PATH"; ' \
+          'eval "$(rbenv init -)"; cd /home/mastodon/live && ' \
+          'RAILS_ENV=production ./bin/tootctl media remove\'')
+          .with_user('mastodon')
       }
     end
 
