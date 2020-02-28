@@ -20,7 +20,7 @@ GEM
     pg (0.20.0)
     powerpack (0.1.2)
     rainbow (3.0.0)
-    rake (12.0.0)
+    rake (12.3.3)
     rspec (3.8.0)
       rspec-core (~> 3.8.0)
       rspec-expectations (~> 3.8.0)
