@@ -9,6 +9,14 @@
     install_recommends: no
   with_items: "{{ packages }}"
 
+- name: Install letsencrypt certbot
+  package:
+    name: "certbot"
+  when: (
+    (ansible_distribution == "Debian" && ansible_distribution_major_version >= 9)
+    || (ansible_distribution == "Ubuntu" && ansible_distribution_release == 'eoan')
+    || (ansible_distribution == "Ubuntu" && ansible_distribution_release == 'focal'))
+
 - name: nodejs alternative
   alternatives:
     name: node
