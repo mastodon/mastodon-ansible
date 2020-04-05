@@ -20,7 +20,7 @@ describe 'Ansible Debian target' do
     end
 
     describe command('ruby -v') do
-      its(:stdout) { should match(/2\.6\.5/) }
+      its(:stdout) { should match(/2\.6\.6/) }
     end
 
     describe file('/usr/bin/nodejs') do
