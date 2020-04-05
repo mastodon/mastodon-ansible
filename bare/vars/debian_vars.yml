@@ -15,7 +15,6 @@ packages:
   - package: "imagemagick"
   - package: "libffi-dev"
   - package: "libgdbm-dev"
-  - package: "libgdbm5"
   - package: "libicu-dev"
   - package: "libidn11-dev"
   - package: "libncurses5-dev"
