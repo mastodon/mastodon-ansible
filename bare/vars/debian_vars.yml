@@ -35,6 +35,7 @@ packages:
   - package: "unattended-upgrades"
   - package: "yarn"
   - package: "zlib1g-dev"
+  - package: "certbot"
 
 postgres:
   packages:
