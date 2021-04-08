@@ -1,11 +1,13 @@
+# frozen_string_literal: true
+
 # vim: set syntax=ruby:
 # rubocop:disable Metrics/BlockLength
-# rubocop:disable Layout/IndentHeredoc
+# rubocop:disable Layout/HeredocIndentation
 Vagrant.configure('2') do |config|
   config.vm.define 'bare', primary: true do |bare|
     bare.vm.box = 'ubuntu/bionic64'
     bare.vm.network 'private_network', type: 'dhcp'
-    bare.vm.provision 'ansible' do |ansible|
+    bare.vm.provision 'ansible_local' do |ansible|
       ansible.playbook = 'bare/playbook.yml'
       ansible.extra_vars = {
         mastodon_db_password: 'CHANGEME',
@@ -41,11 +43,11 @@ SHELL
   config.vm.define 'docker' do |docker|
     docker.vm.box = 'ubuntu/bionic64'
     docker.vm.network 'private_network', type: 'dhcp'
-    docker.vm.provision 'ansible' do |ansible|
+    docker.vm.provision 'ansible_local' do |ansible|
       ansible.playbook = 'docker/playbook.yml'
       ansible.verbose = true
     end
   end
 end
-# rubocop:enable Layout/IndentHeredoc
+# rubocop:enable Layout/HeredocIndentation
 # rubocop:enable Metrics/BlockLength
