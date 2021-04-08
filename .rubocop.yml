@@ -1,0 +1,10 @@
+# This is the configuration used to check the rubocop source code.
+
+AllCops:
+  NewCops: enable
+  Exclude:
+    - 'vendor/**/*'
+    - 'spec/fixtures/**/*'
+    - 'env/**/*'
+    - '.git/**/*'
+  SuggestExtensions: false
