@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'docker-api'
 require 'pg'
 require 'serverspec'
