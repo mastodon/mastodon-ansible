@@ -4,7 +4,7 @@ This playbook contains several roles for provisioning a ready-to-go Mastodon ins
 
 ## Prerequisites for running the playbook
 
-- Python 2.x (>= 2.7.12)
+- Python 3.x
 - Virtualenv (>= 15.0.3)
 - pip/python-pip (>= 8.x)
 

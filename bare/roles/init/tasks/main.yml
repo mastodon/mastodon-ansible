@@ -16,11 +16,11 @@
   ignore_errors: True
 
 - name: Bootstrap Python on Amazon Linux
-  raw: yum update && yum install -y python27
+  raw: yum update && yum install -y python3
   when: python_installed is failed and yum_installed is succeeded
   become: yes
 
 - name: Bootstrap Python on Ubuntu Linux
-  raw: apt update && apt install -y python
+  raw: apt update && apt install -y python3
   when: python_installed is failed and apt_installed is succeeded
   become: yes
