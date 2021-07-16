@@ -1,6 +1,6 @@
 ruby_version: "2.7.4"
 rbenv_version: "v1.1.2"
-ruby_build_version: "v20210405"
+ruby_build_version: "v20210707"
 bundler_version: "2.1.4"
 node_major_version: "12"
 os_family: "{{ ansible_os_family|lower }}"
