@@ -1,4 +1,4 @@
-ruby_version: "2.7.2"
+ruby_version: "2.7.4"
 rbenv_version: "v1.1.2"
 ruby_build_version: "v20210405"
 bundler_version: "2.1.4"
