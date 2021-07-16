@@ -1,7 +1,7 @@
 ---
 
 - name: Check if Python is installed
-  raw: command -v python
+  raw: command -v python3
   register: python_installed
   ignore_errors: True
 
