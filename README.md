@@ -17,6 +17,8 @@ for testing purposes:
 ```sh
 $ virtualenv -p /usr/bin/python3 env
 $ source env/bin/activate
+$ git clone https://github.com/mastodon/mastodon-ansible.git
+$ cd mastodon-ansible
 $ pip install -r requirements.txt
 ```
 ## Running the playbooks
