@@ -24,7 +24,7 @@ jobs:
           name: Run Ansible playbook
           command: |
             source env/bin/activate
-            ansible-playbook bare/playbook.yml -v --connection=local -i localhost, --skip-tags=firewall,letsencrypt,systemd --extra-vars="@templates/secrets.yml.tpl" --extra-vars="mastodon_db_login_user=mastodon mastodon_db_login_host=localhost mastodon_db_login_password=CHANGEME mastodon_host=example.com"
+            ansible-playbook bare/playbook.yml -v --connection=local -i localhost, -e 'ansible_python_interpreter=/usr/bin/python3' --skip-tags=firewall,letsencrypt,systemd --extra-vars="@templates/secrets.yml.tpl" --extra-vars="mastodon_db_login_user=mastodon mastodon_db_login_host=localhost mastodon_db_login_password=CHANGEME mastodon_host=example.com"
 
       - run:
           name: Run ServerSpec tests
