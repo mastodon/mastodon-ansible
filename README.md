@@ -15,8 +15,10 @@ for testing purposes:
 ## Setup
 
 ```sh
-$ virtualenv env
+$ virtualenv -p /usr/bin/python3 env
 $ source env/bin/activate
+$ git clone https://github.com/mastodon/mastodon-ansible.git
+$ cd mastodon-ansible
 $ pip install -r requirements.txt
 ```
 ## Running the playbooks
@@ -26,7 +28,7 @@ $ pip install -r requirements.txt
 This playbook is intended to be run on a "bare" (virtual) server, with the support for provisioning the Mastodon stack as well as a PostgresSQL and Redis database.
 
 ```sh
-$ ansible-playbook playbook.yml -i <your-host-here>, -u <remote-user> --extra-vars="mastodon_db_password=your-password mastodon_host=example.com"
+$ ansible-playbook playbook.yml -i <your-host-here>, -u <remote-user> --ask-become-pass -e 'ansible_python_interpreter=/usr/bin/python3' --extra-vars="mastodon_db_password=your-password mastodon_host=example.com"
 ```
 
 The playbook is using `become` for some of its tasks, hence the user you connect to the instance with will have to have access to sudo. It should ask you for the password in due time.

@@ -3,7 +3,7 @@
 - name: Allow ssh through firewall
   ufw:
     proto: tcp
-    port: 22
+    port: "22"
     rule: allow
 - name: Set ufw policy
   ufw: 
@@ -13,10 +13,10 @@
 - name: Allow nginx firewall
   ufw: 
     proto: tcp
-    port: 80
+    port: "80"
     rule: allow
 - name: Allow nginx ssl firewall
   ufw: 
     proto: tcp
-    port: 443
+    port: "443"
     rule: allow
