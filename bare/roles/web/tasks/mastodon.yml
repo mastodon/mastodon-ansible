@@ -1,8 +1,13 @@
-- name: Clone mastodon
+- name: Fetch latest Mastodon version number
+  shell: "git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' https://github.com/mastodon/mastodon.git | tail --lines=1 | cut --delimiter='/' --fields=3"
+  register: latest_mastodon_tag
+
+- name: Clone Mastodon
   git:
     repo: "https://github.com/mastodon/mastodon.git"
     dest: "{{ mastodon_home }}/{{mastodon_path}}"
     clone: true
+    version: "{{ latest_mastodon_tag.stdout }}"
 
 # - name: Update to latest version
 #   shell: "git fetch; git checkout $(git tag -l | grep -v 'rc[0-9]*$' | sort -V | tail -n 1)"
@@ -55,47 +60,96 @@
 - stat: path={{ mastodon_home }}/{{ mastodon_path }}/.env.production
   register: production_config
 
+- name: Generate SECRET_KEY_BASE secret
+  shell: "RAILS_ENV=production ~/.rbenv/shims/bundle exec rake secret"
+  args:
+    chdir: "{{ mastodon_home }}/{{ mastodon_path }}"
+  register: secret_key_base
+  when: not production_config.stat.exists
+
+- name: Generate OTP_SECRET secret
+  shell: "RAILS_ENV=production ~/.rbenv/shims/bundle exec rake secret"
+  args:
+    chdir: "{{ mastodon_home }}/{{ mastodon_path }}"
+  register: otp_secret
+  when: not production_config.stat.exists
+
+- name: "Generate VAPID key pair into {{ mastodon_home }}/{{ mastodon_path }}/vapid.tmp"
+  shell: "RAILS_ENV=production ~/.rbenv/shims/bundle exec rake mastodon:webpush:generate_vapid_key > {{ mastodon_home }}/{{ mastodon_path }}/vapid.tmp | head -1 | cut -c 19-"
+  args:
+    chdir: "{{ mastodon_home }}/{{ mastodon_path }}"
+  when: not production_config.stat.exists
+
+- name: Get VAPID_PRIVATE_KEY secret
+  shell: "cat {{ mastodon_home }}/{{ mastodon_path }}/vapid.tmp | head -1 | cut -c 19-"
+  register: vapid_private_key
+  when: not production_config.stat.exists
+
+- name: Get VAPID_PUBLIC_KEY secret
+  shell: "cat {{ mastodon_home }}/{{ mastodon_path }}/vapid.tmp | tail -1 | cut -c 18-"
+  register: vapid_public_key
+  when: not production_config.stat.exists
+
+- name: Ensure that the file used for vapid keypair generation is removed.
+  ansible.builtin.file:
+    path: "{{ mastodon_home }}/{{ mastodon_path }}/vapid.tmp"
+    state: absent
+
+- name: Install Production env file
+  template:
+    src: files/mastodon/env.production.j2
+    dest: "{{ mastodon_home }}/{{ mastodon_path }}/.env.production"
+  when: not production_config.stat.exists
+
+- name: Create database
+  shell: "RAILS_ENV=production ~/.rbenv/shims/bundle exec rails db:setup"
+  args:
+    chdir: "{{ mastodon_home }}/{{ mastodon_path }}"
+  environment:
+    SAFETY_ASSURED: 1
+  when: not production_config.stat.exists
+
 - name: Migrate database
   shell: "RAILS_ENV=production ~/.rbenv/shims/bundle exec rails db:migrate"
   args:
     chdir: "{{ mastodon_home }}/{{ mastodon_path }}"
   when: production_config.stat.exists
 
+- name: Ensure that we have correct file permissions with owner being the user and NGINX being the group
+  become: yes
+  become_user: root
+  file:
+    path: "{{ mastodon_home }}/{{ mastodon_path }}"
+    owner: "{{ mastodon_user }}"
+    group: "nginx"
+    recurse: yes
+  when:
+    - ansible_os_family == "RedHat"
+
+- name: Ensure that we have correct file permissions with owner being the user and www-data being the group
+  become: yes
+  become_user: root
+  file:
+    path: "{{ mastodon_home }}/{{ mastodon_path }}"
+    owner: "{{ mastodon_user }}"
+    group: "www-data"
+    recurse: yes
+  when:
+    - ansible_os_family == "Debian"
+
 - name: Precompile assets
   shell: "RAILS_ENV=production ~/.rbenv/shims/bundle exec rails assets:precompile"
   args:
     chdir: "{{ mastodon_home }}/{{ mastodon_path }}"
-  when: production_config.stat.exists
+#We are installing new .env file, checking if .env file exists no longer required
+#  when: production_config.stat.exists
 
-- name: Enable mastodon-web
-  command: systemctl enable mastodon-web.service
-  become: true
+- name: "Start and enable Mastodon services"
+  become: yes
+  #Workaround for "Interactive authentication required" issue
   become_user: root
-
-- name: Enable mastodon-streaming
-  command: systemctl enable mastodon-streaming.service
-  become: true
-  become_user: root
-
-- name: Enable mastodon-sidekiq
-  command: systemctl enable mastodon-sidekiq.service
-  become: true
-  become_user: root
-
-- name: Restart mastodon-web
-  command: systemctl restart mastodon-web.service
-  when: production_config.stat.exists
-  become: true
-  become_user: root
-
-- name: Restart mastodon-streaming
-  command: systemctl restart mastodon-streaming.service
-  when: production_config.stat.exists
-  become: true
-  become_user: root
-
-- name: Restart mastodon-sidekiq
-  command: systemctl restart mastodon-sidekiq.service
-  when: production_config.stat.exists
-  become: true
-  become_user: root
+  service: "name={{ item }} state=started enabled=yes"
+  with_items:
+  - mastodon-web.service
+  - mastodon-streaming.service
+  - mastodon-sidekiq.service

@@ -1,24 +1,63 @@
 ---
-- include: repositories.yml
-  when: os_family == "debian"
 
-- include: packages.yml
-  become: true
-- include: ufw.yml
-  become: true
-  tags:
-    - firewall
-- include: user.yml
-  become: true
-- include: ruby.yml
-  become: true
-  become_user: mastodon
-- include: mastodon.yml
-  become: true
-  become_user: mastodon
-- include: letsencrypt.yml
-  become: true
-  tags:
-    - letsencrypt 
-- include: nginx.yml
-  become: true
+- include_tasks: user.yml
+  args:
+    apply:
+      become: true
+
+- include_tasks: nodejs.yml
+
+- include_tasks: repositories.yml
+
+- include_tasks: packages.yml
+  args:
+    apply:
+      become: true
+
+#RHEL uses firwall-cmd
+- include_tasks: ufw.yml
+  args:
+    apply:
+      become: true
+      tags:
+        - firewall
+  when: 
+  - ansible_os_family == "Debian"
+
+- include_tasks: firewall-cmd.yml
+  args:
+    apply:
+      become: true
+      tags:
+        - firewall
+  when: 
+  - ansible_os_family == "RedHat"
+
+- include_tasks: ruby.yml
+  args:
+    apply:
+      become: true
+      become_user: mastodon
+
+- include_tasks: redis.yml
+
+- include_tasks: selfsigned-ssl.yml
+  when: disable_letsencrypt | bool
+
+- include_tasks: mastodon.yml
+  args:
+    apply:
+      become: true
+      become_user: mastodon
+
+- include_tasks: letsencrypt.yml
+  args:
+    apply:
+      become: true
+      tags:
+        - letsencrypt 
+
+- include_tasks: nginx.yml
+  args:
+    apply:
+      become: true

@@ -1,0 +1,20 @@
+---
+
+- name: Create folder location for self-signed SSL certs
+  become: yes
+  file: 
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    recurse: yes
+  loop: 
+    - "{{ self_signed_cert_location }}"
+    - "{{ self_signed_key_location }}"
+
+- name: Create self-signed certificate
+  become: yes
+  shell: >
+    openssl req -x509 -nodes -subj '/CN={{ mastodon_host }}' -days 365
+    -newkey rsa:4096 -sha256 -keyout '{{ self_signed_key_location }}/server.key' -out '{{ self_signed_cert_location }}/server.crt'
+    creates='{{ self_signed_cert_location }}/server.crt'

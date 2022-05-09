@@ -1,0 +1,32 @@
+#Ansible is not able to work with "dnf module" outside of installing them.
+#Shell has to be used to check if a specific app stream is enabled, and then disable and enable
+#the appropriate app streams to get the correct nodejs version for Yarn.
+- name: Check if NodeJS 10 module is enabled
+  become: yes
+  shell: "dnf module list nodejs | grep -q 'nodejs 10 \\[d\\]\\[e\\]' && echo true || echo false"
+  register: is_node10_enabled
+  ignore_errors: true
+  when: ansible_os_family == "RedHat"
+
+- name: Disable NodeJS 10 module
+  become: yes
+  shell: "dnf module disable nodejs:10 -y"
+  ignore_errors: true
+  when: 
+  - ansible_os_family == "RedHat"
+  - is_node10_enabled.stdout | bool
+
+- name: Enable NodeJS 16 module
+  become: yes
+  shell: "dnf module enable nodejs:16 -y"
+  ignore_errors: true
+  when: 
+  - ansible_os_family == "RedHat"
+  - is_node10_enabled.stdout | bool
+
+- name: Install nodejs 16-epel via DNF
+  become: yes
+  dnf:
+    name: "@nodejs:16"
+    state: present
+  when: ansible_os_family == "RedHat"    
