@@ -40,15 +40,13 @@ Vagrant.configure('2') do |config|
       shell.inline = <<SHELL
       # Ruby is installed as mastodon user, that user has no permission to run ufw
       # because of that we do this little workaround
-     #sudo ##sudo ufw status 2>&1 > /home/vagrant/ufw_result.txt
-     #sudo #ssudo -u mastodon -i /bin/sh <<MASTODO 
-     #sudo systemctl stop firewalld
-     #sudo systemctl disable firewalld
-      #cd /home/vagrant
-      #bundle install
-      #bundle exec rubocop
-      #bundle exec rspec
-#MASTODON_BLOCK
+      sudo ufw status 2>&1 > /home/vagrant/ufw_result.txt
+      sudo -u mastodon -i /bin/sh <<MASTODO 
+      cd /home/vagrant
+      bundle install
+      bundle exec rubocop
+      bundle exec rspec
+MASTODON_BLOCK
 SHELL
     end
   end
