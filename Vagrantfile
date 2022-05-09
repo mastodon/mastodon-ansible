@@ -23,7 +23,6 @@ Vagrant.configure('2') do |config|
         mastodon_host: 'mastodon.local',
         redis_pass: 'CHANGEME',
         local_domain: 'mastodon.local',
-        db_pass: 'CHANGEME',
         disable_letsencrypt: 'true'
       }
       ansible.verbose = true

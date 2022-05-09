@@ -27,31 +27,46 @@ $ pip install -r requirements.txt
 
 This playbook is intended to be run on a "bare" (virtual) server, with the support for provisioning the Mastodon stack as well as a PostgresSQL and Redis database.
 
+Typing secret content directly at the command line (without a prompt) leaves the secret string in your shell history. You should use [Ansible Vault](https://docs.ansible.com/ansible/latest/user_guide/vault.html) to secure your Mastodon database credentials for the use with Ansible instead.
+
+The `/templates/secrets.yml.tpl` contains an example template that you can use.
+
+To encrypt `secrets.yml`, use this following command:
+
 ```sh
-$ ansible-playbook playbook.yml -i <your-host-here>, -u <remote-user> --ask-become-pass -e 'ansible_python_interpreter=/usr/bin/python3' --extra-vars="mastodon_db_password=your-password mastodon_host=example.com"
+$ ansible-vault encrypt secrets.yml
+```
+
+Then run the playbook as following:
+
+```sh
+$ ansible-playbook playbook.yml --ask-vault-pass -i <your-host-here>, -u <remote-user> --ask-become-pass -e 'ansible_python_interpreter=/usr/bin/python3' --extra-vars="@secrets.yml"
+```
+
+If you prefer not to use Ansible Vault, you can run the playbook as following:
+
+```sh
+$ ansible-playbook playbook.yml -i <your-host-here>, -u <remote-user> --ask-become-pass -e 'ansible_python_interpreter=/usr/bin/python3' --extra-vars="mastodon_db_password=your-password redis_pass=your-password mastodon_host=example.com"
 ```
 
 The playbook is using `become` for some of its tasks, hence the user you connect to the instance with will have to have access to sudo. It should ask you for the password in due time.
 
 _Note: This assumes you're within the virtualenv already._
 
-After you installed everything for the first time, you should run the mastodon setup wizard. This is only required once. After that the system
-will can be automatically updated with rerunning the Ansible script.
+After the playbook has finished its execution, Mastodon now should be available at the hostname you defined and you're not required run the mastodon setup wizard. As Email servers differ widly from configuration to configuration **you must edit the .env.production file and add your own email server details followed by restart of Mastodon services.**
 
-To run the wizard, follow these steps:
+To edit .env.production, follow these steps:
 
 ```bash
 ssh yourmachine
 su - mastodon
 cd ~/live
-RAILS_ENV=production bundle exec rake mastodon:setup
+nano .env.production
+systemctl restart mastodon-*.service
 ```
 
-After that start the mastodon services with:
+To see a list of available environment variables for your Mastodon installation, please refer to the [Mastodon Configuring your environment documentation](https://docs.joinmastodon.org/admin/config/).
 
-```bash
-systemctl start mastodon-*.service
-```
 
 #### Roles
 
@@ -73,13 +88,22 @@ This role contains the following tasks:
 - `packages.yml`: **Installs all the required packages** for Mastodon to run (see `vars/<distro>_vars.yml` for a list)
 - `ruby.yml`: **Installs rbenv/ruby** globally so you can run Mastodon (it's a Ruby on Rails app)
 - `user.yml`: **Adds a user to run Mastodon with** since you shouldn't be running Mastodon under a privileged account.
+- `firewall-cmd.yml`: **Starts and enables firewall for RHEL based systems** and permitting SSH, HTTP and HTTPS, as not using a firewall is insecure.
+- `ufw.yml`: **Starts and enables firewall for Debian based systems** and permitting SSH, HTTP and HTTPS, as not using a firewall is insecure.
+- `mastodon.yml`: **Downloads and installs latest version of Mastodon** and all of its required dependencies. This role generates required secrets and installs env.production file, not requiring to run the Mastodon setup wizard.
+- `nginx.yml`: **Installs Mastodon configuration for NGINX** and sets correct SELinux policies for RHEL systems.
+- `nodejs.yml`: **Enables NodeJS 16 DNF module for RHEL 8+ systems** to ensure that we have correct NodeJS version installed.
+- `redis.yml`: **Secures Redis installation with a password** as you shouldn't run redis with no password protection.
+- `selfsigned-ssl.yml`: **Generates self-signed SSL certificates when LetsEncrypt not used** as Mastodon requires SSL to function.
 
 ##### Settings
 
 | config setting  | explanation |
 |-----------------|-------------|
-| mastodon_host   | The url where your mastodon instance is reachable. E.g. `example.social`
-| disable_hsts    | Per default the system will enable [HSTS](https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security). You can set this to `true` if you want to disable it.
+| mastodon_host                 | The url where your mastodon instance is reachable. E.g. `example.social`
+| disable_hsts                  | Per default the system will enable [HSTS](https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security). You can set this to `true` if you want to disable it.
+| disable_letsencrypt           | Per default the system will attempt to obtain SSL certificate via LetsEncrypt. You can set this to `true` if you want to disable it.
+| use_http                      | Per default the system will use HTTPS and redirect any HTTP traffic to HTTPS. Useful for development or reverse proxy scenarios. You can set this to `true` if you want to enable it.
 
 #### PostgresSQL
 
@@ -122,6 +146,12 @@ $ ansible-playbook playbook -i <your-host-here>, -u <remote-user> --extra-vars="
 #### redis
 
 This role installs the [Redis](https://redis.io) key-value store, used by Mastodon, and its client libraries.
+
+##### Settings
+
+| config setting  | explanation |
+|-----------------|-------------|
+| redis_pass                    | Password used to secure the redis server.
 
 ### Docker
 
