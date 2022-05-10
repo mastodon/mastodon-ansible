@@ -13,8 +13,8 @@ Vagrant.configure('2') do |config|
 
     # We need to disable nested virtualization since GitHub Actions doesn't support it
     # https://github.com/actions/virtual-environments/issues/183#issuecomment-610723516
-    v.customize ["modifyvm", :id, "--hwvirtex", "off"] if ENV['CI'] == "true"
-    v.customize ["modifyvm", :id, "--vtxvpid", "off"] if ENV['CI'] == "true"
+    vb.customize ["modifyvm", :id, "--hwvirtex", "off"] if ENV['CI'] == "true"
+    vb.customize ["modifyvm", :id, "--vtxvpid", "off"] if ENV['CI'] == "true"
   end
 
   config.vm.define 'bare', primary: true do |bare|
