@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+goss_version = "0.3.16"
+
 # vim: set syntax=ruby:
 # rubocop:disable Metrics/BlockLength
 # rubocop:disable Layout/HeredocIndentation
@@ -8,7 +10,12 @@ Vagrant.configure('2') do |config|
 #https://github.com/rails/webpacker/issues/955
   config.vm.provider "virtualbox" do |vb|
     vb.memory = "4096"
-   end
+
+    # We need to disable nested virtualization since GitHub Actions doesn't support it
+    # https://github.com/actions/virtual-environments/issues/183#issuecomment-610723516
+    v.customize ["modifyvm", :id, "--hwvirtex", "off"] if ENV['CI'] == "true"
+    v.customize ["modifyvm", :id, "--vtxvpid", "off"] if ENV['CI'] == "true"
+  end
 
   config.vm.define 'bare', primary: true do |bare|
 #Used for RHEL testing
@@ -29,7 +36,7 @@ Vagrant.configure('2') do |config|
       ansible.skip_tags = 'letsencrypt'
     end
 
-    %w[Gemfile Gemfile.lock spec .rspec].each do |file|
+    %w[goss.yaml vars.yaml].each do |file|
       bare.vm.provision 'file',
                         source: file,
                         destination: file
@@ -38,25 +45,13 @@ Vagrant.configure('2') do |config|
     bare.vm.provision 'shell' do |shell|
       shell.privileged = false
       shell.inline = <<SHELL
-      # Ruby is installed as mastodon user, that user has no permission to run ufw
-      # because of that we do this little workaround
-      sudo ufw status 2>&1 > /home/vagrant/ufw_result.txt
-      sudo -u mastodon -i /bin/sh <<MASTODO 
-      cd /home/vagrant
-      bundle install
-      bundle exec rubocop
-      bundle exec rspec
-MASTODON_BLOCK
+curl -Lo /tmp/goss https://github.com/aelsabbahy/goss/releases/download/v#{goss_version}/goss-linux-amd64 && \
+echo "827e354b48f93bce933f5efcd1f00dc82569c42a179cf2d384b040d8a80bfbfb  /tmp/goss" | sha256sum -c --strict - && \
+sudo install -m0755 -o root -g root /tmp/goss /usr/bin/goss && \
+rm /tmp/goss
+cd /vagrant
+sudo goss --vars vars.yaml validate
 SHELL
-    end
-  end
-
-  config.vm.define 'docker' do |docker|
-    docker.vm.box = 'ubuntu/bionic64'
-    docker.vm.network 'private_network', type: 'dhcp'
-    docker.vm.provision 'ansible_local' do |ansible|
-      ansible.playbook = 'docker/playbook.yml'
-      ansible.verbose = true
     end
   end
 end

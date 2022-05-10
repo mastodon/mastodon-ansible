@@ -1,4 +1,4 @@
-# [![CircleCI](https://circleci.com/gh/tootsuite/mastodon-ansible.svg?style=svg)](https://circleci.com/gh/tootsuite/mastodon-ansible) Ansible playbook for installing Mastodon
+# [![test](https://github.com/mastodon/mastodon-ansible/actions/workflows/test.yml/badge.svg)](https://github.com/mastodon/mastodon-ansible/actions/workflows/test.yml) Ansible playbook for installing Mastodon
 
 This playbook contains several roles for provisioning a ready-to-go Mastodon instance.
 
@@ -10,7 +10,7 @@ This playbook contains several roles for provisioning a ready-to-go Mastodon ins
 
 for testing purposes:
 
-- Vagrant >= 1.9.3
+- Vagrant >= 2.2.19
 
 ## Setup
 
@@ -107,7 +107,7 @@ This role contains the following tasks:
 
 #### PostgresSQL
 
-This role installs PostgresSQL, adds a database (named `mastodon_development` by default) and a user (named `mastodon` by default). For connecting to the database it can either use a local socket by setting the variable `mastodon_db_login_unix_socket` to the directory the Postgres socket lives in (`/var/run/postgresql` by default under Ubuntu 18.04) or a remote PostgreSQL instance you have installed somewhere else. You will than have to set the `mastodon_db_login_host` (IP address or hostname of database), `mastodon_db_port` (the port the database is accessible on; default `5432`), `mastodon_db_login_user` (the administrative user to connect to the database with) and `mastodon_db_login_password`.
+This role installs PostgresSQL, adds a database (named `mastodon_instance` by default) and a user (named `mastodon` by default). For connecting to the database it can either use a local socket by setting the variable `mastodon_db_login_unix_socket` to the directory the Postgres socket lives in (`/var/run/postgresql` by default under Ubuntu 18.04) or a remote PostgreSQL instance you have installed somewhere else. You will than have to set the `mastodon_db_login_host` (IP address or hostname of database), `mastodon_db_port` (the port the database is accessible on; default `5432`), `mastodon_db_login_user` (the administrative user to connect to the database with) and `mastodon_db_login_password`.
 
 ##### Settings
 
@@ -159,22 +159,21 @@ FIXME
 
 ## Testing
 
-Testing is done using [ServerSpec](https://serverspec.org). The tests are located in `spec/`. The tests are incorporating a [rubocop](http://rubocop.readthedocs.io/en/latest/) run.
+Testing is done using [Goss](https://github.com/aelsabbahy/goss). The tests are in the `goss.yaml` file and include variables from the `vars.yaml` file.
 
-### CircleCI
+### Continuous Integration
 
-This repository is regularly running tests using CircleCI. Its configuration can be found in `.circleci/config.yml`.
+This repository is regularly running tests using GitHub Actions. Its configuration can be found in `.github/workflows/test.yml`.
 
 ### Local testing
 
 ```sh
-$ vagrant up bare|docker
+$ vagrant up
 ```
 
 This should provision a new instance within VirtualBox and run all the tests necessary to verify the Ansible playbook is valid. By default it runs the bare provisioning.
 
 # TODO
 
-- Add letsencrypt
 - Add CentOS/RedHat/Amazon Linux support
 - Add LB role

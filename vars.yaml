@@ -1,0 +1,42 @@
+ubuntu:
+  packages:
+    - "autoconf"
+    - "bison"
+    - "build-essential"
+    - "curl"
+    - "ffmpeg"
+    - "file"
+    - "g++"
+    - "gcc"
+    - "git"
+    - "imagemagick"
+    - "libffi-dev"
+    - "libgdbm-dev"
+    - "libgdbm6"
+    - "libicu-dev"
+    - "libidn11-dev"
+    - "libncurses5-dev"
+    - "libpq-dev"
+    - "libprotobuf-dev"
+    - "libreadline-dev"
+    - "libssl-dev"
+    - "libxml2-dev"
+    - "libxslt1-dev"
+    - "libyaml-dev"
+    - "nginx"
+    - "nodejs"
+    - "pkg-config"
+    - "protobuf-compiler"
+    - "sudo"
+    - "yarn"
+    - "zlib1g-dev"
+    - "redis-server"
+    - "redis-tools"
+  service_files:
+    - "/etc/systemd/system/mastodon-web.service"
+    - "/etc/systemd/system/mastodon-streaming.service"
+    - "/etc/systemd/system/mastodon-sidekiq.service"
+  firewall_open_ports:
+    - 22
+    - 80
+    - 443
