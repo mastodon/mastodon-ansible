@@ -4,14 +4,25 @@
 # rubocop:disable Metrics/BlockLength
 # rubocop:disable Layout/HeredocIndentation
 Vagrant.configure('2') do |config|
+#RAM has to be bumped up due of precompile assets silently failing with just 1GB of RAM
+#https://github.com/rails/webpacker/issues/955
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "4096"
+   end
+
   config.vm.define 'bare', primary: true do |bare|
-    bare.vm.box = 'ubuntu/bionic64'
+#Used for RHEL testing
+#    bare.vm.box = "geerlingguy/rockylinux8"
+    bare.vm.box = 'ubuntu/focal64'
+#    bare.vm.network 'private_network', ip: '192.168.56.12'
     bare.vm.network 'private_network', type: 'dhcp'
     bare.vm.provision 'ansible_local' do |ansible|
       ansible.playbook = 'bare/playbook.yml'
       ansible.extra_vars = {
         mastodon_db_password: 'CHANGEME',
-        mastodon_host: 'example.com',
+        mastodon_host: 'mastodon.local',
+        redis_pass: 'CHANGEME',
+        local_domain: 'mastodon.local',
         disable_letsencrypt: 'true'
       }
       ansible.verbose = true
@@ -30,7 +41,7 @@ Vagrant.configure('2') do |config|
       # Ruby is installed as mastodon user, that user has no permission to run ufw
       # because of that we do this little workaround
       sudo ufw status 2>&1 > /home/vagrant/ufw_result.txt
-      sudo -u mastodon -i /bin/sh <<MASTODON_BLOCK
+      sudo -u mastodon -i /bin/sh <<MASTODO 
       cd /home/vagrant
       bundle install
       bundle exec rubocop
@@ -51,3 +62,6 @@ SHELL
 end
 # rubocop:enable Layout/HeredocIndentation
 # rubocop:enable Metrics/BlockLength
+
+
+

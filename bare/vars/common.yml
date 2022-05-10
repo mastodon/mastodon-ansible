@@ -1,14 +1,23 @@
-ruby_version: "2.7.4"
-rbenv_version: "v1.1.2"
-ruby_build_version: "v20210707"
+#rbenv: version `3.0.3' is not installed (set by /home/mastodon/live/.ruby-version)
+ruby_version: "3.0.3"
+rbenv_version: "v1.2.0"
+ruby_build_version: "v20220426"
 bundler_version: "2.1.4"
-node_major_version: "12"
+node_major_version: "16"
 os_family: "{{ ansible_os_family|lower }}"
 mastodon_user: "mastodon"
 mastodon_home: "/home/{{ mastodon_user }}"
 mastodon_db_user: "{{ mastodon_user }}"
 mastodon_path: "live"
-mastodon_db: "{{ mastodon_user }}_development"
+mastodon_db: "{{ mastodon_user }}_instance"
 mastodon_db_port: 5432
+mastodon_nginx_symlink: "/var/www/html/mastodon"
 disable_hsts: "false"
 disable_letsencrypt: "false"
+#Use HTTP only for Vagrant testing or for reverse proxy purposes.
+use_http: "false"
+redis_host: localhost
+redis_port: 6379
+db_host: /var/run/postgresql
+self_signed_cert_location: /etc/ssl/certs
+self_signed_key_location: /etc/ssl/private

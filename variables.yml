@@ -1,5 +1,5 @@
 # Mastodon setup
-local_domain: example.com
+local_domain: mastodon.local
 local_https: false
 # web_domain: mastodon.example.com
 # alternate_domains: example1.com,example2.com
@@ -10,11 +10,12 @@ default_locale: en
 # prepared_statements: false
 
 # Redis
-redis_host: redis
+redis_host: localhost
 redis_port: 6379
+redis_pass: CHANGEME
 
 # Postgres
-db_host: db
+db_host: /var/run/postgresql
 db_user: mastodon
 db_name: mastodon
 db_pass: CHANGEME
@@ -30,7 +31,7 @@ vapid_public_key: CHANGEME
 # Email
 # email_domain_blacklist: example1.com|example2.de|etc
 # email_domain_whitelist: example1.com|example2.de|etc
-smtp_server: smtp.example.com
+smtp_server: localhost
 smtp_port: 587
 smtp_login: ""
 smtp_password: ""

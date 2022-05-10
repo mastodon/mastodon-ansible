@@ -1,18 +1,23 @@
 ---
 
+
 - name: Install required packages for HTTPS repositories
   apt: name={{ item.package }} state=present update_cache=yes cache_valid_time=3600
   become: yes
   with_items:
     - package: apt-transport-https
     - package: ca-certificates
-
+  when: 
+  - ansible_os_family == "Debian"
+ 
 - name: Install APT repository keys
   apt_key: id={{ item.id }} url={{ item.url }} state=present
   become: yes
   with_items:
     - { id: "72ECF46A56B4AD39C907BBB71646B01B86E50310", url: "https://dl.yarnpkg.com/debian/pubkey.gpg" }
     - { id: "9FD3B784BC1C6FC31A8A0A1C1655A0AB68576280", url: "https://deb.nodesource.com/gpgkey/nodesource.gpg.key" }
+  when: 
+  - ansible_os_family == "Debian"
 
 - name: Install APT repositories
   apt_repository: repo={{ item.repo }} state=present
@@ -20,3 +25,30 @@
   with_items:
     - repo: "deb https://dl.yarnpkg.com/debian/ stable main"
     - repo: "deb https://deb.nodesource.com/node_{{ node_major_version }}.x {{ ubuntu_codename }} main"
+  when: 
+  - ansible_os_family == "Debian"
+
+- name: Install RPMFusion repository for RHEL
+  become: yes
+  dnf:
+    name: "https://mirrors.rpmfusion.org/free/el/rpmfusion-free-release-{{ ansible_distribution_major_version }}.noarch.rpm"
+    #distribution-gpg-keys doesn't contain the up to date GPG keys for RPMFusion and even official RPMFusion install instructions
+    #specify to ignore GPG checks.
+    disable_gpg_check: yes
+    state: present
+  when: ansible_os_family == "RedHat"    
+
+- name: Install Yarn repository for RHEL
+  become: yes
+  get_url:
+    url: https://dl.yarnpkg.com/rpm/yarn.repo
+    dest: /etc/yum.repos.d/yarn.repo
+    mode: '0644'
+  when: ansible_os_family == "RedHat"    
+
+- name: Import the Yarn repository GPG key for RHEL
+  become: yes
+  rpm_key:
+    state: present
+    key: https://dl.yarnpkg.com/rpm/pubkey.gpg
+  when: ansible_os_family == "RedHat"    
