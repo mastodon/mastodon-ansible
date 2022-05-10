@@ -13,8 +13,12 @@ Vagrant.configure('2') do |config|
 
     # We need to disable nested virtualization since GitHub Actions doesn't support it
     # https://github.com/actions/virtual-environments/issues/183#issuecomment-610723516
-    vb.customize ["modifyvm", :id, "--hwvirtex", "off"] if ENV['CI'] == "true"
-    vb.customize ["modifyvm", :id, "--vtxvpid", "off"] if ENV['CI'] == "true"
+    #
+    # I have disabled this for now since we are running our tests on macOS (for now) which has "native" Vagrant support on GH
+    #
+    # %w[hwvirtex vtxvpid vtxux].each do |instruction|
+    #   vb.customize ["modifyvm", :id, "--#{instruction}", "off"]
+    # end if ENV['CI'] == "true"
   end
 
   config.vm.define 'bare', primary: true do |bare|
@@ -34,12 +38,6 @@ Vagrant.configure('2') do |config|
       }
       ansible.verbose = true
       ansible.skip_tags = 'letsencrypt'
-    end
-
-    %w[goss.yaml vars.yaml].each do |file|
-      bare.vm.provision 'file',
-                        source: file,
-                        destination: file
     end
 
     bare.vm.provision 'shell' do |shell|
