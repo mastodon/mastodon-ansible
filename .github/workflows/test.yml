@@ -23,6 +23,6 @@ jobs:
           update: true
           install: vagrant
       - name: Install virtualbox
-        run: apt install -y virtualbox
+        run: sudo apt install -y virtualbox
       - name: Run tests in Vagrant
         run: vagrant up
