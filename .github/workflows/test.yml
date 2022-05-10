@@ -2,7 +2,7 @@ name: test
 on: [push, pull_request]
 
 jobs:
-  build-push:
+  test:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -13,5 +13,16 @@ jobs:
           key: ${{ runner.os }}-vagrant-${{ hashFiles('Vagrantfile') }}
           restore-keys: |
             ${{ runner.os }}-vagrant-
+      - name: Add Hashicorp repository
+        uses: myci-actions/add-deb-repo@10
+        with:
+          repo: deb [arch=amd64] https://apt.releases.hashicorp.com focal main
+
+          repo-name: hashicorp
+          keys-asc: https://apt.releases.hashicorp.com/gpg
+          update: true
+          install: vagrant
+      - name: Install virtualbox
+        run: sudo apt install -y virtualbox
       - name: Run tests in Vagrant
         run: vagrant up
