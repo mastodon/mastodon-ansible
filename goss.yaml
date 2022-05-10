@@ -1,0 +1,72 @@
+file:
+  /etc/os-release:
+    exists: true
+    contains:
+      - "ubuntu"
+  /home/mastodon/.bashrc:
+    exists: true
+    owner: "mastodon"
+    group: "mastodon"
+    filetype: "file"
+    mode: "0664"
+    contains: ["rbenv init -", "PATH="]
+  /usr/bin/node:
+    exists: true
+    filetype: "file"
+    mode: "0755"
+  /home/mastodon/.rbenv/plugins/ruby-build/bin/ruby-build:
+    exists: true
+    filetype: "file"
+    mode: "0775"
+    owner: "mastodon"
+  /home/mastodon/live:
+    exists: true
+    filetype: "directory"
+    owner: "mastodon"
+  /etc/nginx/sites-available/mastodon.conf:
+    exists: true
+    filetype: "file"
+  /etc/nginx/sites-enabled/mastodon.conf:
+    exists: true
+    filetype: "symlink"
+{{range .Vars.ubuntu.service_files }}
+  {{.}}:
+    exists: true
+    filetype: "file"
+{{end}}
+
+command:
+  ruby:
+    exit-status: 0
+    exec: "sudo -u mastodon -i ruby -v"
+    stdout:
+      - "3.0.3"
+  crontab:
+    exit-status: 0
+    exec: "crontab -l -u mastodon"
+    stdout:
+      - "15 1 * * * /bin/bash -c 'export PATH=\"$HOME/.rbenv/bin:$PATH\"; eval \"$(rbenv init -)\"; cd /home/mastodon/live && RAILS_ENV=production ./bin/tootctl media remove'"
+  ufw:
+    exit-status: 0
+    exec: "ufw status"
+    stdout:
+{{range .Vars.ubuntu.firewall_open_ports }}
+      - "/{{.}}/tcp \\s* ALLOW \\s* Anywhere/"
+      - "/{{.}}/tcp \\(v6\\) \\s* ALLOW \\s* Anywhere \\(v6\\)/"
+{{end}}
+  postgres:
+    exit-status: 0
+    exec: "PGPASSWORD=CHANGEME psql -d mastodon_instance -h 127.0.0.1 -U mastodon -c 'CREATE TABLE test (v varchar(20)); DROP TABLE test;'"
+
+user:
+  mastodon:
+    exists: true
+    groups:
+      - mastodon
+    home: /home/mastodon
+    shell: /bin/bash
+package:
+{{range .Vars.ubuntu.packages }}
+  {{.}}:
+    installed: true
+{{end}}

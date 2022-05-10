@@ -4,13 +4,50 @@ After=network.target
 
 [Service]
 Type=simple
-User=mastodon
+User={{ mastodon_user }}
 WorkingDirectory={{ mastodon_home }}/{{ mastodon_path }}
 Environment="RAILS_ENV=production"
-Environment="DB_POOL=5"
-ExecStart={{ mastodon_home }}/.rbenv/shims/bundle exec sidekiq -c 5 -q default -q push -q mailers -q pull
+Environment="DB_POOL=25"
+Environment="MALLOC_ARENA_MAX=2"
+Environment="LD_PRELOAD=libjemalloc.so"
+ExecStart={{ mastodon_home }}/.rbenv/shims/bundle exec sidekiq -c 25
 TimeoutSec=15
 Restart=always
+# Proc filesystem
+ProcSubset=pid
+ProtectProc=invisible
+# Capabilities
+CapabilityBoundingSet=
+# Security
+NoNewPrivileges=true
+# Sandboxing
+ProtectSystem=strict
+PrivateTmp=true
+PrivateDevices=true
+PrivateUsers=true
+ProtectHostname=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET
+RestrictAddressFamilies=AF_INET6
+RestrictAddressFamilies=AF_NETLINK
+RestrictAddressFamilies=AF_UNIX
+RestrictNamespaces=true
+LockPersonality=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+RemoveIPC=true
+PrivateMounts=true
+ProtectClock=true
+# System Call Filtering
+SystemCallArchitectures=native
+SystemCallFilter=~@cpu-emulation @debug @keyring @ipc @mount @obsolete @privileged @setuid
+SystemCallFilter=@chown
+SystemCallFilter=pipe
+SystemCallFilter=pipe2
+ReadWritePaths={{ mastodon_home }}/{{ mastodon_path }}
 
 [Install]
 WantedBy=multi-user.target

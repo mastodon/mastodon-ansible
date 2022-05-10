@@ -1,0 +1,29 @@
+---
+- name: "Start and enable FirewallD service"
+  become: yes
+  #Workaround for "Interactive authentication required" issue
+  become_user: root
+  service: "name={{ item }} state=started enabled=yes"
+  with_items:
+  - firewalld
+
+- name: Allow SSH, HTTP and HTTPS through the firewall
+  firewalld:
+    permanent: yes
+    immediate: yes
+    service: "{{ item }}"
+    state: enabled
+  with_items:
+  - http
+  - https
+  - ssh
+
+- name: Add localhost lo interface to the trusted zone
+  firewalld:
+    permanent: yes
+    immediate: yes
+    interface: "{{ item }}"
+    zone: trusted
+    state: enabled
+  with_items:
+  - lo

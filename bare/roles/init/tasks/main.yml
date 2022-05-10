@@ -10,6 +10,12 @@
   register: yum_installed
   ignore_errors: True
 
+#This checks if running higher Redhat version than 7
+- name: Check if dnf is installed
+  raw: command -v dnf
+  register: dnf_installed
+  ignore_errors: True
+
 - name: Check if apt is installed
   raw: command -v apt
   register: apt_installed
@@ -23,4 +29,9 @@
 - name: Bootstrap Python on Ubuntu Linux
   raw: apt update && apt install -y python3
   when: python_installed is failed and apt_installed is succeeded
+  become: yes
+
+- name: Enable Powertools repository for Redhat dependency
+  raw: dnf config-manager --set-enabled powertools
+  when: dnf_installed is succeeded
   become: yes

@@ -1,0 +1,33 @@
+- name: "Start and enable redis service"
+  become: yes
+  #Workaround for "Interactive authentication required" issue
+  become_user: root
+  service: "name={{ item }} state=started enabled=yes"
+  with_items:
+  - redis
+
+- name: Set Redis password for RHEL system
+  become: yes
+  lineinfile:
+    dest: "/etc/redis.conf"
+    regexp: "ˆrequirepass"
+    line: "requirepass {{ redis_pass }}"
+    state: present
+  when: 
+  - ansible_os_family == "RedHat"
+
+- name: Set Redis password for Debian system
+  become: yes
+  lineinfile:
+    dest: "/etc/redis/redis.conf"
+    regexp: "ˆrequirepass"
+    line: "requirepass {{ redis_pass }}"
+    state: present
+  when: 
+  - ansible_os_family == "Debian"
+
+- name: Restart Redis
+  become: yes
+  #Workaround for "Interactive authentication required" issue
+  become_user: root
+  service: name=redis state=restarted

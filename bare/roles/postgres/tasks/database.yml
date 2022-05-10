@@ -1,4 +1,29 @@
-- name: Create database {{ mastodon_db }}
+#Debian PostgreSQL installation automatically calls initdb i.e. it initializes the cluster with default encoding and locale.
+#https://wiki.debian.org/PostgreSql
+#RHEL requires manual initialisation
+
+- name: "Find out if PostgreSQL is initialized"
+  stat:
+    path: "/var/lib/pgsql/data/pg_hba.conf"
+  register: postgres_data
+  when: 
+  - ansible_os_family == "RedHat"
+
+- name: "Initialize PostgreSQL"
+  shell: "postgresql-setup initdb"
+  when: 
+  - ansible_os_family == "RedHat"
+  - not postgres_data.stat.exists
+
+- name: "Start and enable services"
+  become: yes
+  #Workaround for "Interactive authentication required" issue
+  become_user: root
+  service: "name={{ item }} state=started enabled=yes"
+  with_items:
+  - postgresql
+
+- name: Create remote database {{ mastodon_db }}
   postgresql_db:
     name: "{{ mastodon_db }}"
     login_host: "{{ mastodon_db_login_host }}"
@@ -12,7 +37,7 @@
     - mastodon_db_login_password is defined
     - mastodon_db_port is defined
 
-- name: Create database user {{ mastodon_db_user }}
+- name: Create remote database user {{ mastodon_db_user }}
   postgresql_user:
     db: "{{ mastodon_db }}"
     name: "{{ mastodon_db_user }}"
@@ -30,6 +55,7 @@
     - mastodon_db_port is defined
 
 - name: Create database {{ mastodon_db }}
+  become: yes
   postgresql_db:
     name: "{{ mastodon_db }}"
     login_unix_socket: "{{ mastodon_db_login_unix_socket }}"
@@ -37,6 +63,7 @@
   when: create_remote_db is skipped
 
 - name: Create database user {{ mastodon_db_user }}
+  become: yes
   postgresql_user:
     db: "{{ mastodon_db }}"
     name: "{{ mastodon_db_user }}"

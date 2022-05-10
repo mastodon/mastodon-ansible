@@ -1,16 +1,26 @@
 ---
 
+#Speeds up the provisioning process as cache is not updated for every single package.
+- name: Update package manager cache before installing packages.
+  become: yes
+  package:
+    update_cache: yes
+
 - name: Install packages
   package:
     name: "{{ item.package }}"
-    update_cache: yes
-    cache_valid_time: 3600
-    state: latest
-    install_recommends: no
+    update_cache: no
+    #This makes the package module non-OS generic
+    #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/package_module.html
+    #    state: latest
+    #    install_recommends: no
   with_items: "{{ packages }}"
 
-- name: nodejs alternative
-  alternatives:
-    name: node
-    link: /usr/bin/node
-    path: /usr/bin/nodejs
+#RHEL and Debian already has NodeJS in /usr/bin/node
+#Unclear what this is supposed to fix
+#- name: nodejs alternative
+#  alternatives:
+#    name: node
+#    link: /usr/bin/node
+#    path: /usr/bin/nodejs
+#  when: ansible_os_family == "Debian"

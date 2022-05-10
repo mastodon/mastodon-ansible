@@ -1,6 +1,8 @@
 ---
 
-- include: packages.yml
-- include: database.yml
-  become: true
-  become_user: postgres
+- include_tasks: packages.yml
+- include_tasks: database.yml
+  args:
+    apply:
+      become: true
+      become_user: postgres

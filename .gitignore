@@ -1,5 +1,7 @@
 /playbook.retry
 /.vagrant
+/.vagrant/*
+/.vagrant/**/*
 /*.log
 /env
 /vendor
