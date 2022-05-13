@@ -116,6 +116,31 @@
     - ansible_os_family == "RedHat"
     - mastodon_host is defined
 
+- name: Permit SELinux permission to allow NGINX to make proxy connections with httpd_can_network_connect
+  become: yes
+  shell: "setsebool -P httpd_can_network_connect 1"
+  when:
+    - ansible_os_family == "RedHat"
+    - mastodon_host is defined
+
+- name: Permit SELinux permission to allow NGINX to make proxy connections with httpd_can_network_relay
+  become: yes
+  shell: "setsebool -P httpd_can_network_relay 1"
+  when:
+    - ansible_os_family == "RedHat"
+    - mastodon_host is defined
+
+#Reading and writing into users home directories as a web server or executing any binary as systemd service is
+#really pretty anomalous behaviour. SELinux is completely right to flag this as it looks like we're an attacker. 
+#Potential security issue?
+
+- name: Permit SELinux permission to allow NGINX to read contents of home folders (Required for Mastodon)
+  become: yes
+  shell: "setsebool -P httpd_enable_homedirs on"
+  when:
+    - ansible_os_family == "RedHat"
+    - mastodon_host is defined
+
 - name: Change SELinux properties of Mastodon symlink
   become: yes
   shell: "chcon -Rt httpd_sys_content_t {{ mastodon_nginx_symlink }}"

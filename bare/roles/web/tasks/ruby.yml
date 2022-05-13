@@ -56,3 +56,11 @@
   args:
     executable: /bin/bash
   when: default_ruby_version is succeeded
+
+- name: Set SELinux policy for rbenv bundle same as /bin
+  become: yes
+  #Workaround for "SELinux policy is not managed or store cannot be accessed" issue
+  become_user: root
+  shell: "chcon -R --reference /bin {{ mastodon_home }}/.rbenv/shims/bundle"
+  when:
+    - ansible_os_family == "RedHat"
