@@ -53,9 +53,9 @@ The playbook is using `become` for some of its tasks, hence the user you connect
 
 _Note: This assumes you're within the virtualenv already._
 
-After the playbook has finished its execution, Mastodon now should be available at the hostname you defined and you're not required run the mastodon setup wizard. As Email servers differ widly from configuration to configuration **you must edit the .env.production file and add your own email server details followed by restart of Mastodon services.**
+After the playbook has finished its execution, Mastodon now should be available at the hostname you defined and you're not required run the Mastodon setup wizard. As Email servers differ widely from configuration to configuration **you must edit the .env.production file and add your own email server details followed by restart of Mastodon services.**
 
-To edit .env.production, follow these steps:
+To edit `.env.production`, follow these steps:
 
 ```bash
 ssh yourmachine
@@ -65,7 +65,7 @@ nano .env.production
 systemctl restart mastodon-*.service
 ```
 
-To see a list of available environment variables for your Mastodon installation, please refer to the [Mastodon Configuring your environment documentation](https://docs.joinmastodon.org/admin/config/).
+To see a list of available environment variables for your Mastodon installation, please refer to [the Mastodon documentation](https://docs.joinmastodon.org/admin/config/).
 
 
 #### Roles
@@ -176,5 +176,4 @@ This should provision a new instance within VirtualBox and run all the tests nec
 
 # TODO
 
-- Add CentOS/RedHat/Amazon Linux support
 - Add LB role
