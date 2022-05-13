@@ -1,5 +1,5 @@
-ubuntu:
-  packages:
+packages:
+  ubuntu:
     - "autoconf"
     - "bison"
     - "build-essential"
@@ -32,11 +32,18 @@ ubuntu:
     - "zlib1g-dev"
     - "redis-server"
     - "redis-tools"
-  service_files:
-    - "/etc/systemd/system/mastodon-web.service"
-    - "/etc/systemd/system/mastodon-streaming.service"
-    - "/etc/systemd/system/mastodon-sidekiq.service"
-  firewall_open_ports:
-    - 22
-    - 80
-    - 443
+  rhel: []
+service_files:
+  - "/etc/systemd/system/mastodon-web.service"
+  - "/etc/systemd/system/mastodon-streaming.service"
+  - "/etc/systemd/system/mastodon-sidekiq.service"
+services:
+  - nginx
+  - postgresql
+  - mastodon-sidekiq
+  - mastodon-streaming
+  - mastodon-web
+firewall_open_ports:
+  - 22
+  - 80
+  - 443

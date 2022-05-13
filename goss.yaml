@@ -2,7 +2,7 @@ file:
   /etc/os-release:
     exists: true
     contains:
-      - "ubuntu"
+      - {{getEnv "TARGET" "ubuntu"}}
   /home/mastodon/.bashrc:
     exists: true
     owner: "mastodon"
@@ -17,22 +17,45 @@ file:
   /home/mastodon/.rbenv/plugins/ruby-build/bin/ruby-build:
     exists: true
     filetype: "file"
+{{- if eq (getEnv "TARGET" "ubuntu") "rhel" }}
+    mode: "0755"
+{{- else }}
     mode: "0775"
+{{- end }}
     owner: "mastodon"
   /home/mastodon/live:
     exists: true
     filetype: "directory"
     owner: "mastodon"
-  /etc/nginx/sites-available/mastodon.conf:
+{{- if eq (getEnv "TARGET" "ubuntu") "rhel" -}}
+{{- $nginxConfigLocation := "conf.d"}}
+{{- $nginxConfigEnabled := "default.d"}}
+  /etc/nginx/{{- $nginxConfigLocation }}/mastodon.conf:
     exists: true
     filetype: "file"
-  /etc/nginx/sites-enabled/mastodon.conf:
+  /etc/nginx/{{- $nginxConfigEnabled }}/mastodon.conf:
     exists: true
     filetype: "symlink"
-{{range .Vars.ubuntu.service_files }}
+{{- else -}}
+{{- $nginxConfigLocation := "sites-available"}}
+{{- $nginxConfigEnabled := "sites-enabled"}}
+  /etc/nginx/{{- $nginxConfigLocation }}/mastodon.conf:
+    exists: true
+    filetype: "file"
+  /etc/nginx/{{- $nginxConfigEnabled }}/mastodon.conf:
+    exists: true
+    filetype: "symlink"
+{{- end -}}
+{{range .Vars.service_files }}
   {{.}}:
     exists: true
     filetype: "file"
+{{end}}
+service:
+{{range .Vars.services }}
+  {{.}}:
+    enabled: true
+    running: true
 {{end}}
 
 command:
@@ -43,16 +66,18 @@ command:
       - "3.0.3"
   crontab:
     exit-status: 0
-    exec: "crontab -l -u mastodon"
+    exec: "sudo crontab -l -u mastodon"
     stdout:
       - "15 1 * * * /bin/bash -c 'export PATH=\"$HOME/.rbenv/bin:$PATH\"; eval \"$(rbenv init -)\"; cd /home/mastodon/live && RAILS_ENV=production ./bin/tootctl media remove'"
+{{if eq .Env.TARGET "ubuntu"}}
   ufw:
     exit-status: 0
     exec: "ufw status"
     stdout:
-{{range .Vars.ubuntu.firewall_open_ports }}
+{{range .Vars.firewall_open_ports }}
       - "/{{.}}/tcp \\s* ALLOW \\s* Anywhere/"
       - "/{{.}}/tcp \\(v6\\) \\s* ALLOW \\s* Anywhere \\(v6\\)/"
+{{end}}
 {{end}}
   postgres:
     exit-status: 0
@@ -66,7 +91,9 @@ user:
     home: /home/mastodon
     shell: /bin/bash
 package:
-{{range .Vars.ubuntu.packages }}
+{{if eq .Env.TARGET "ubuntu"}}
+{{range .Vars.packages.ubuntu }}
   {{.}}:
     installed: true
+{{end}}
 {{end}}
