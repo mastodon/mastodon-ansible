@@ -1,58 +1,35 @@
----
-- name: Clone rbenv
-  git:
-    repo: "https://github.com/rbenv/rbenv.git"
-    dest: "~/.rbenv"
-    clone: true
-    version: "{{ rbenv_version }}"
-
-- name: Clone ruby-build
-  git:
-    repo: "https://github.com/rbenv/ruby-build.git"
-    dest: "~/.rbenv/plugins/ruby-build"
-    clone: true
-    version: "{{ ruby_build_version }}"
-  register: ruby_build
-
-- name: Configure rbenv
-  command: ./configure
-  args:
-    chdir: "~/.rbenv/src"
-  register: rbenv_configure
-
-- name: Build rbenv
-  command: make
-  args:
-    chdir: "~/.rbenv/src"
-  when: rbenv_configure is succeeded
+- name: Install frum
+  ansible.builtin.unarchive:
+    src: "https://github.com/TaKO8Ki/frum/releases/download/v{{ frum_version }}/frum-v{{ frum_version }}-x86_64-unknown-linux-musl.tar.gz"
+    dest: /usr/bin/
+    include: ["frum-v{{ frum_version }}-x86_64-unknown-linux-musl/frum"]
+    owner: root
+    group: root
+    mode: "0755"
+    creates: /usr/bin/frum
+    remote_src: yes
+    extra_opts:
+      - --strip-components
+      - 1
+  become: true
 
 - name: Update profile settings
   copy:
     dest: "~/.bashrc"
     content: |
-      export PATH="~/.rbenv/bin:${PATH}"
-      eval "$(rbenv init -)"
+      eval "$(frum init)"
 
 - name: Check if the Ruby version is already installed
-  shell: "~/.rbenv/bin/rbenv versions | grep -q {{ ruby_version }}"
+  shell: bash -lc "ruby -v | grep -q {{ ruby_version }}"
   register: ruby_installed
-  ignore_errors: yes
-  check_mode: no
+  ignore_errors: true
+  check_mode: false
 
 - name: Install Ruby {{ ruby_version }}
-  shell: "~/.rbenv/bin/rbenv install {{ ruby_version }}"
-  args:
-    executable: /bin/bash
+  shell: bash -lc "frum install {{ ruby_version }}"
+  register: new_ruby_installed
   when: ruby_installed is failed
 
 - name: Set the default Ruby version to {{ ruby_version }}
-  shell: "~/.rbenv/bin/rbenv global {{ ruby_version }}"
-  args:
-    executable: /bin/bash
-  register: default_ruby_version
-
-- name: Install bundler
-  shell: 'export PATH="$HOME/.rbenv/bin:$PATH"; eval "$(rbenv init -)"; gem install bundler:{{ bundler_version }}'
-  args:
-    executable: /bin/bash
-  when: default_ruby_version is succeeded
+  shell: bash -lc "frum global {{ ruby_version }}"
+  when: new_ruby_installed is succeeded
