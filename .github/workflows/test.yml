@@ -5,7 +5,7 @@ jobs:
   test:
     runs-on: macos-10.15
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         os: [focal, jammy, rhel]
     steps:
