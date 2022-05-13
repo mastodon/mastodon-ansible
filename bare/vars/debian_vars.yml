@@ -1,5 +1,5 @@
 ubuntu_codename: "{{ ansible_distribution_release }}"
-mastodon_db_login_unix_socket: '/var/run/postgresql'
+mastodon_db_login_unix_socket: "/var/run/postgresql"
 
 packages:
   - package: "autoconf"
@@ -35,6 +35,7 @@ packages:
   - package: "unattended-upgrades"
   - package: "yarn"
   - package: "zlib1g-dev"
+  - package: "libssl-dev"
 
 postgres:
   packages:
@@ -43,7 +44,7 @@ postgres:
     - package: "postgresql-contrib"
     - package: "python3-psycopg2"
     - package: "sudo"
-    #Ansible can't set permissions on temporary files Ansible needs 
+    #Ansible can't set permissions on temporary files Ansible needs
     #to create when becoming an unprivileged user when running as unprivileged user
     #https://docs.ansible.com/ansible-core/2.12/user_guide/become.html#risks-of-becoming-an-unprivileged-user
     - package: "acl"
