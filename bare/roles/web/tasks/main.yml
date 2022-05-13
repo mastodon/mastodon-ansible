@@ -14,7 +14,7 @@
     apply:
       become: true
 
-#RHEL uses firwall-cmd
+#RHEL uses firewall-cmd
 - include_tasks: ufw.yml
   args:
     apply:
@@ -56,6 +56,7 @@
       become: true
       tags:
         - letsencrypt 
+  when: disable_letsencrypt | bool == false
 
 - include_tasks: nginx.yml
   args:
