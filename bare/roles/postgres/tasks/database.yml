@@ -6,22 +6,22 @@
   stat:
     path: "/var/lib/pgsql/data/pg_hba.conf"
   register: postgres_data
-  when: 
-  - ansible_os_family == "RedHat"
+  when:
+    - ansible_os_family == "RedHat"
 
 - name: "Initialize PostgreSQL"
   shell: "postgresql-setup initdb"
-  when: 
-  - ansible_os_family == "RedHat"
-  - not postgres_data.stat.exists
+  when:
+    - ansible_os_family == "RedHat"
+    - not postgres_data.stat.exists
 
 - name: "Start and enable services"
-  become: yes
+  become: true
   #Workaround for "Interactive authentication required" issue
   become_user: root
   service: "name={{ item }} state=started enabled=yes"
   with_items:
-  - postgresql
+    - postgresql
 
 - name: Create remote database {{ mastodon_db }}
   postgresql_db:
@@ -55,7 +55,7 @@
     - mastodon_db_port is defined
 
 - name: Create database {{ mastodon_db }}
-  become: yes
+  become: true
   postgresql_db:
     name: "{{ mastodon_db }}"
     login_unix_socket: "{{ mastodon_db_login_unix_socket }}"
@@ -63,7 +63,7 @@
   when: create_remote_db is skipped
 
 - name: Create database user {{ mastodon_db_user }}
-  become: yes
+  become: true
   postgresql_user:
     db: "{{ mastodon_db }}"
     name: "{{ mastodon_db_user }}"

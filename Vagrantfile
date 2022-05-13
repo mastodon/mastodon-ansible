@@ -1,15 +1,26 @@
-# frozen_string_literal: true
+goss_version = '0.3.16'
+install_goss = <<~SHELL
+  echo "The target is \$TARGET" && \
+  curl -Lo /tmp/goss https://github.com/aelsabbahy/goss/releases/download/v#{goss_version}/goss-linux-amd64 && \
+  echo "827e354b48f93bce933f5efcd1f00dc82569c42a179cf2d384b040d8a80bfbfb  /tmp/goss" | sha256sum -c --strict - && \
+  sudo install -m0755 -o root -g root /tmp/goss /usr/bin/goss && \
+  rm /tmp/goss
+  cd /vagrant
+  sudo -E goss --vars vars.yaml validate
+SHELL
+ansible_extra_vars = {
+  mastodon_db_password: 'CHANGEME',
+  mastodon_host: 'mastodon.local',
+  redis_pass: 'CHANGEME',
+  local_domain: 'mastodon.local',
+  disable_letsencrypt: 'true'
+}
 
-goss_version = "0.3.16"
-
-# vim: set syntax=ruby:
-# rubocop:disable Metrics/BlockLength
-# rubocop:disable Layout/HeredocIndentation
 Vagrant.configure('2') do |config|
-#RAM has to be bumped up due of precompile assets silently failing with just 1GB of RAM
-#https://github.com/rails/webpacker/issues/955
-  config.vm.provider "virtualbox" do |vb|
-    vb.memory = "4096"
+  # RAM has to be bumped up due of precompile assets silently failing with just 1GB of RAM
+  # https://github.com/rails/webpacker/issues/955
+  config.vm.provider 'virtualbox' do |vb|
+    vb.memory = '4096'
 
     # We need to disable nested virtualization since GitHub Actions doesn't support it
     # https://github.com/actions/virtual-environments/issues/183#issuecomment-610723516
@@ -21,40 +32,54 @@ Vagrant.configure('2') do |config|
     # end if ENV['CI'] == "true"
   end
 
-  config.vm.define 'bare', primary: true do |bare|
-#Used for RHEL testing
-#    bare.vm.box = "geerlingguy/rockylinux8"
-    bare.vm.box = 'ubuntu/focal64'
-#    bare.vm.network 'private_network', ip: '192.168.56.12'
+  [
+    {
+      name: 'focal',
+      primary: true,
+      autostart: true
+    },
+    {
+      name: 'jammy',
+      primary: false,
+      autostart: false
+    }
+  ].each do |d|
+    config.vm.define d[:name], primary: d[:primary], autostart: d[:autostart] do |bare|
+      bare.vm.box = "ubuntu/#{d[:name]}64"
+      bare.vm.network 'private_network', type: 'dhcp'
+      bare.vm.provision 'ansible_local' do |ansible|
+        ansible.playbook = 'bare/playbook.yml'
+        ansible.extra_vars = ansible_extra_vars
+        ansible.verbose = true
+        ansible.skip_tags = 'letsencrypt'
+      end
+
+      bare.vm.provision 'shell' do |shell|
+        shell.privileged = false
+        shell.env = {
+          'TARGET' => 'ubuntu'
+        }
+        shell.inline = install_goss
+      end
+    end
+  end
+
+  config.vm.define 'rhel', autostart: false do |bare|
+    bare.vm.box = 'geerlingguy/rockylinux8'
     bare.vm.network 'private_network', type: 'dhcp'
     bare.vm.provision 'ansible_local' do |ansible|
       ansible.playbook = 'bare/playbook.yml'
-      ansible.extra_vars = {
-        mastodon_db_password: 'CHANGEME',
-        mastodon_host: 'mastodon.local',
-        redis_pass: 'CHANGEME',
-        local_domain: 'mastodon.local',
-        disable_letsencrypt: 'true'
-      }
+      ansible.extra_vars = ansible_extra_vars
       ansible.verbose = true
       ansible.skip_tags = 'letsencrypt'
     end
 
     bare.vm.provision 'shell' do |shell|
-      shell.privileged = false
-      shell.inline = <<SHELL
-curl -Lo /tmp/goss https://github.com/aelsabbahy/goss/releases/download/v#{goss_version}/goss-linux-amd64 && \
-echo "827e354b48f93bce933f5efcd1f00dc82569c42a179cf2d384b040d8a80bfbfb  /tmp/goss" | sha256sum -c --strict - && \
-sudo install -m0755 -o root -g root /tmp/goss /usr/bin/goss && \
-rm /tmp/goss
-cd /vagrant
-sudo goss --vars vars.yaml validate
-SHELL
+      shell.privileged = true
+      shell.env = {
+        'TARGET' => 'rhel'
+      }
+      shell.inline = install_goss
     end
   end
 end
-# rubocop:enable Layout/HeredocIndentation
-# rubocop:enable Metrics/BlockLength
-
-
-

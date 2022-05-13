@@ -4,6 +4,10 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: macos-10.15
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu, rhel]
     steps:
       - uses: actions/checkout@v3
       - name: Cache Vagrant boxes
@@ -14,4 +18,4 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-vagrant-
       - name: Run tests in Vagrant
-        run: vagrant up
+        run: vagrant up ${{ matrix.os }}
