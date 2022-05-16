@@ -12,6 +12,7 @@
       - --strip-components
       - 1
   become: true
+  become_user: root
 
 - name: Update profile settings
   copy:

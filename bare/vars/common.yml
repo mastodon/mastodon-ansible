@@ -1,6 +1,5 @@
 ruby_version: "3.0.3"
 frum_version: "0.1.2"
-ruby_build_version: "v20220426"
 node_major_version: "16"
 os_family: "{{ ansible_os_family|lower }}"
 mastodon_user: "mastodon"
