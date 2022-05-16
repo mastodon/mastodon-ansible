@@ -29,13 +29,9 @@ file:
     owner: "mastodon"
 {{- if eq (getEnv "TARGET" "ubuntu") "rhel" -}}
 {{- $nginxConfigLocation := "conf.d"}}
-{{- $nginxConfigEnabled := "default.d"}}
   /etc/nginx/{{- $nginxConfigLocation }}/mastodon.conf:
     exists: true
     filetype: "file"
-  /etc/nginx/{{- $nginxConfigEnabled }}/mastodon.conf:
-    exists: true
-    filetype: "symlink"
 {{- else -}}
 {{- $nginxConfigLocation := "sites-available"}}
 {{- $nginxConfigEnabled := "sites-enabled"}}
