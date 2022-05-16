@@ -14,12 +14,6 @@ file:
     exists: true
     filetype: "file"
     mode: "0755"
-{{- if eq (getEnv "TARGET" "ubuntu") "rhel" }}
-    mode: "0755"
-{{- else }}
-    mode: "0775"
-{{- end }}
-    owner: "mastodon"
   /home/mastodon/live:
     exists: true
     filetype: "directory"
