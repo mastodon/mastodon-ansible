@@ -9,14 +9,11 @@ file:
     group: "mastodon"
     filetype: "file"
     mode: "0664"
-    contains: ["rbenv init -", "PATH="]
+    contains: ["frum init"]
   /usr/bin/node:
     exists: true
     filetype: "file"
     mode: "0755"
-  /home/mastodon/.rbenv/plugins/ruby-build/bin/ruby-build:
-    exists: true
-    filetype: "file"
 {{- if eq (getEnv "TARGET" "ubuntu") "rhel" }}
     mode: "0755"
 {{- else }}
@@ -66,7 +63,7 @@ command:
     exit-status: 0
     exec: "sudo crontab -l -u mastodon"
     stdout:
-      - "15 1 * * * /bin/bash -c 'export PATH=\"$HOME/.rbenv/bin:$PATH\"; eval \"$(rbenv init -)\"; cd /home/mastodon/live && RAILS_ENV=production ./bin/tootctl media remove'"
+      - 15 1 * * * /bin/bash -lc "cd /home/mastodon/live && RAILS_ENV=production ./bin/tootctl media remove"
 {{if eq .Env.TARGET "ubuntu"}}
   ufw:
     exit-status: 0
