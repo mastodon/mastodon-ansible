@@ -24,7 +24,10 @@ file:
     exists: true
     filetype: "file"
   /etc/nginx/nginx.conf:
-    contains: "include /etc/nginx/{{- $nginxConfigLocation }}/*.conf;"
+    exists: true
+    filetype: "file"
+    contains:
+      - "include /etc/nginx/{{- $nginxConfigLocation }}/*.conf;"
 {{- else -}}
 {{- $nginxConfigLocation := "sites-available"}}
 {{- $nginxConfigEnabled := "sites-enabled"}}

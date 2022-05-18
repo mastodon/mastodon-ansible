@@ -1,19 +1,11 @@
 goss_version = '0.3.16'
 install_goss = <<~SHELL
-  echo "The target is \$TARGET" && \
   curl -Lo /tmp/goss https://github.com/aelsabbahy/goss/releases/download/v#{goss_version}/goss-linux-amd64 && \
   echo "827e354b48f93bce933f5efcd1f00dc82569c42a179cf2d384b040d8a80bfbfb  /tmp/goss" | sha256sum -c --strict - && \
   sudo install -m0755 -o root -g root /tmp/goss /usr/bin/goss && \
   rm /tmp/goss
   cd /vagrant
   sudo -E goss --vars vars.yaml validate
-SHELL
-
-# Fix for https://github.com/mastodon/mastodon-ansible/pull/33#issuecomment-1126071199
-postgres_use_md5 = <<~SHELL
-  sudo sed -i 's/host\s\s\s\sall\s\s\s\s\s\s\s\s\s\s\s\s\sall\s\s\s\s\s\s\s\s\s\s\s\s\s127.0.0.1\/32\s\s\s\s\s\s\s\s\s\s\s\sident/host    all             all             127.0.0.1\/32                 md5/g' /var/lib/pgsql/data/pg_hba.conf
-  sudo sed -i 's/host\s\s\s\sall\s\s\s\s\s\s\s\s\s\s\s\s\sall\s\s\s\s\s\s\s\s\s\s\s\s\s::1\/128\s\s\s\s\s\s\s\s\s\s\s\s\s\s\s\s\sident/host    all             all             ::1\/128                 md5/g' /var/lib/pgsql/data/pg_hba.conf
-  sudo systemctl restart postgresql
 SHELL
 
 ansible_extra_vars = {
@@ -81,13 +73,27 @@ Vagrant.configure('2') do |config|
   end
 
   config.vm.define 'rhel', autostart: false do |bare|
-    bare.vm.box = 'geerlingguy/rockylinux8'
+    bare.vm.box = 'bento/rockylinux-8.5'
     bare.vm.network 'private_network', type: 'dhcp'
 
     bare.vm.provision 'shell' do |shell|
       shell.privileged = true
+
+      # We need to install Ansible manually here because the system-provided Ansible is broken
       shell.inline = <<~SHELL
-        install -m0777 -d -o vagrant -o vagrant /var/tmp/ansible
+        install -m0777 -d -o vagrant -o vagrant /var/tmp/ansible && \
+        dnf install -y python3 python3-pip python3-cryptography python3-devel python3-setuptools && \
+        alternatives --set python /usr/bin/python3 && \
+        alternatives --set python3 /usr/bin/python3.6 && \
+        pip3 install ansible
+      SHELL
+    end
+
+    bare.vm.provision 'shell' do |shell|
+      shell.privileged = true
+      shell.inline = <<~SHELL
+        cd /vagrant && \
+        /usr/local/bin/ansible-galaxy install -r meta/requirements.yml
       SHELL
     end
 
@@ -103,8 +109,21 @@ Vagrant.configure('2') do |config|
       shell.env = {
         'TARGET' => 'rhel'
       }
+
+      # Fix for https://github.com/mastodon/mastodon-ansible/pull/33#issuecomment-1126071199
+      shell.inline = <<~POSTGRES
+        sed -i -e 's/\\(^host\\s*all.*\\)ident/\\1md5/g' /var/lib/pgsql/data/pg_hba.conf && \
+        systemctl restart postgresql
+      POSTGRES
+    end
+
+    bare.vm.provision 'shell' do |shell|
+      shell.privileged = true
+      shell.env = {
+        'TARGET' => 'rhel'
+      }
+
       shell.inline = install_goss
-      shell.inline = postgres_use_md5
     end
   end
 end
