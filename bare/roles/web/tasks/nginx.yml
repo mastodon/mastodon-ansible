@@ -148,6 +148,28 @@
     - ansible_os_family == "RedHat"
     - mastodon_host is defined
 
+- name: "Ensure that we have correct file permissions for /var/lib/nginx/ as we are not running NGINX under default user"
+  become: yes
+  become_user: root
+  file:
+    path: "/var/lib/nginx/"
+    owner: "{{ mastodon_user }}"
+    group: "nginx"
+    recurse: yes
+  when:
+    - ansible_os_family == "RedHat"
+
+- name: "Ensure that we have correct file permissions for /var/lib/nginx/ as we are not running NGINX under default user"
+  become: yes
+  become_user: root
+  file:
+    path: "/var/lib/nginx/"
+    owner: "{{ mastodon_user }}"
+    group: "www-data"
+    recurse: yes
+  when:
+    - ansible_os_family == "Debian"
+
 - name: Restart nginx
   become: yes
   #Workaround for "Interactive authentication required" issue
