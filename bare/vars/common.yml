@@ -1,5 +1,5 @@
-#rbenv: version `3.0.3' is not installed (set by /home/mastodon/live/.ruby-version)
-ruby_version: "3.0.3"
+#rbenv: version `3.0.4' is not installed (set by /home/mastodon/live/.ruby-version)
+ruby_version: "3.0.4"
 rbenv_version: "v1.2.0"
 ruby_build_version: "v20220426"
 bundler_version: "2.1.4"
