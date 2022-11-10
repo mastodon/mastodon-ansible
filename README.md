@@ -80,6 +80,18 @@ Skipping the `postgres` role:
 $ ansible-playbook playbook.yml --skip-tags=postgres -i <your-host>, -u <your-user>
 ```
 
+#### Preflight Checks
+
+This role verifies that when you're running this playbook, that you're not jumping to a new major or minor version to prevent potential destructive operation.
+You can easily disable this role via a variable.
+
+##### Settings
+
+| config setting  | explanation |
+|-----------------|-------------|
+| run_preflight_checks                   | If set to true, it will run verification
+
+
 #### web
 
 This role contains the following tasks:
@@ -90,9 +102,10 @@ This role contains the following tasks:
 - `user.yml`: **Adds a user to run Mastodon with** since you shouldn't be running Mastodon under a privileged account.
 - `firewall-cmd.yml`: **Starts and enables firewall for RHEL based systems** and permitting SSH, HTTP and HTTPS, as not using a firewall is insecure.
 - `ufw.yml`: **Starts and enables firewall for Debian based systems** and permitting SSH, HTTP and HTTPS, as not using a firewall is insecure.
-- `mastodon.yml`: **Downloads and installs latest version of Mastodon** and all of its required dependencies. This role generates required secrets and installs env.production file, not requiring to run the Mastodon setup wizard.
+- `mastodon-preflight.yml`: **Downloads latest version of Mastodon** and required dependencies for installing Ruby.
+- `mastodon-postflight.yml`: **Installs latest version of Mastodon** and all of its required dependencies. This role generates required secrets and installs env.production file, not requiring to run the Mastodon setup wizard.
 - `nginx.yml`: **Installs Mastodon configuration for NGINX** and sets correct SELinux policies for RHEL systems.
-- `nodejs.yml`: **Enables NodeJS 16 DNF module for RHEL 8+ systems** to ensure that we have correct NodeJS version installed.
+- `nodejs.yml`: **Enables NodeJS 16 DNF module for RHEL 8 systems** to ensure that we have correct NodeJS version installed.
 - `redis.yml`: **Secures Redis installation with a password** as you shouldn't run redis with no password protection.
 - `selfsigned-ssl.yml`: **Generates self-signed SSL certificates when LetsEncrypt not used** as Mastodon requires SSL to function.
 
@@ -105,6 +118,9 @@ This role contains the following tasks:
 | disable_letsencrypt           | Per default the system will attempt to obtain SSL certificate via LetsEncrypt. You can set this to `true` if you want to disable it.
 | use_http                      | Per default the system will use HTTPS and redirect any HTTP traffic to HTTPS. Useful for development or reverse proxy scenarios. You can set this to `true` if you want to enable it.
 | nginx_catch_all               | Per default the system will only show Mastodon for a defined url in mastodon_host. Useful for development or reverse proxy scenarios. Recommended to use with use_http. You can set this to `true` if you want to enable it.
+| mastodon_version               | Specifies which version of Mastodon you want to download. Default is "latest"
+| mastodon_allow_prerelease               | Specifies if you want to download release candidate builds of Mastodon when "latest" is specified. Default is "false".
+
 
 #### PostgresSQL
 
