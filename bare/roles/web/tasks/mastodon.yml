@@ -1,5 +1,5 @@
 - name: Fetch latest Mastodon version number
-  shell: "git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' https://github.com/mastodon/mastodon.git | tail --lines=1 | cut --delimiter='/' --fields=3"
+  shell: "git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' https://github.com/mastodon/mastodon.git | grep -v "rc" | tail --lines=1 | cut --delimiter='/' --fields=3"
   register: latest_mastodon_tag
 
 - name: Clone Mastodon
