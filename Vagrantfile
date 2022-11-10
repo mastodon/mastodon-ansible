@@ -39,6 +39,9 @@ Vagrant.configure('2') do |config|
     #   vb.customize ["modifyvm", :id, "--#{instruction}", "off"]
     # end if ENV['CI'] == "true"
   end
+  config.vm.provider 'vmware_fusion' do |vb|
+    vb.memory = '4096'
+  end
 
   [
     {
@@ -72,9 +75,33 @@ Vagrant.configure('2') do |config|
     end
   end
 
-  config.vm.define 'rhel', autostart: false do |bare|
-    bare.vm.box = 'geerlingguy/rockylinux8'
+  config.vm.define 'rhel8', autostart: false do |bare|
+    bare.vm.box = 'rockylinux/8'
     bare.vm.network 'private_network', type: 'dhcp'
+    bare.vm.provision 'ansible_local' do |ansible|
+      ansible.playbook = 'bare/playbook.yml'
+      ansible.extra_vars = ansible_extra_vars
+      ansible.verbose = true
+      ansible.skip_tags = 'letsencrypt'
+    end
+
+    bare.vm.provision 'shell' do |shell|
+      shell.privileged = true
+      shell.env = {
+        'TARGET' => 'rhel'
+      }
+      shell.inline = install_goss
+      shell.inline = postgres_use_md5
+    end
+  end
+
+  config.vm.define 'rhel9', autostart: false do |bare|
+    bare.vm.box = 'generic/rocky9'
+    bare.vm.network 'private_network', type: 'dhcp'
+    #Not specifying this results in
+    #this error to be displayed "`playbook` does not exist on the guest: /vagrant/bare/playbook.yml error"
+    #The generic image might be a just a little bit broken, but rockylinux/9 is not ready yet
+    bare.vm.synced_folder ".", "/vagrant"
     bare.vm.provision 'ansible_local' do |ansible|
       ansible.playbook = 'bare/playbook.yml'
       ansible.extra_vars = ansible_extra_vars
