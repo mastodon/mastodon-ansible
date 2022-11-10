@@ -11,10 +11,8 @@
   stat:
     path: "{{ mastodon_home }}/{{mastodon_path}}/.git"
   register: mastodon_is_git
-  when:
-    - mastodon_install_exists.stat.exists
 
-- name: Verify upgrade path for specific version of Mastodon
+- name: Verify if upgrade folder is valid
   fail:
    msg: 
    - "ERROR: A folder defined for Mastodon installation already exists but its not a valid git folder."
@@ -29,6 +27,7 @@
   args:
     chdir: "{{ mastodon_home }}/{{ mastodon_path }}"
   when:
+    - mastodon_install_exists.stat.exists
     - mastodon_is_git.stat.exists
   register: local_major_ver
 
@@ -37,6 +36,7 @@
   args:
     chdir: "{{ mastodon_home }}/{{ mastodon_path }}"
   when:
+    - mastodon_install_exists.stat.exists
     - mastodon_is_git.stat.exists
   register: local_minor_ver
 
@@ -46,6 +46,7 @@
     - mastodon_version == "latest"
     - mastodon_allow_prerelease | bool == false
     - mastodon_is_git.stat.exists
+    - mastodon_install_exists.stat.exists
   register: latest_mastodon_tag_major
 
 - name: Fetch latest stable major Mastodon version number allowing release candidates 
@@ -54,6 +55,7 @@
     - mastodon_version == "latest"
     - mastodon_allow_prerelease | bool
     - mastodon_is_git.stat.exists
+    - mastodon_install_exists.stat.exists
   register: latest_mastodon_tag_rc_major
 
 - name: Fetch latest minor stable Mastodon version number
@@ -62,6 +64,7 @@
     - mastodon_version == "latest"
     - mastodon_allow_prerelease | bool == false
     - mastodon_is_git.stat.exists
+    - mastodon_install_exists.stat.exists
   register: latest_mastodon_tag_minor
 
 - name: Fetch latest minor stable Mastodon version number allowing release candidates 
@@ -70,6 +73,7 @@
     - mastodon_version == "latest"
     - mastodon_allow_prerelease | bool
     - mastodon_is_git.stat.exists
+    - mastodon_install_exists.stat.exists
   register: latest_mastodon_tag_rc_minor
 
 - name: Fetch specified major Mastodon version number
@@ -77,6 +81,7 @@
   when: 
     - mastodon_version != "latest"
     - mastodon_is_git.stat.exists
+    - mastodon_install_exists.stat.exists
   register: specific_mastodon_tag_major
 
 - name: Fetch specified minor Mastodon version number
@@ -84,6 +89,7 @@
   when: 
     - mastodon_version != "latest"
     - mastodon_is_git.stat.exists
+    - mastodon_install_exists.stat.exists
   register: specific_mastodon_tag_minor
 
 - name: Verify MAJOR upgrade path for specific version of Mastodon
@@ -96,6 +102,7 @@
   when: 
   - mastodon_version != "latest"
   - mastodon_is_git.stat.exists
+  - mastodon_install_exists.stat.exists
   - local_major_ver.stdout != specific_mastodon_tag_major.stdout
 
 - name: Verify MAJOR upgrade path for Latest Mastodon with allowed prerelease versions
@@ -122,6 +129,7 @@
     - mastodon_version == "latest"
     - mastodon_allow_prerelease | bool == false
     - mastodon_install_exists.stat.exists
+    - mastodon_is_git.stat.exists
     - local_major_ver.stdout != latest_mastodon_tag_major.stdout
 
 - name: Verify MINOR upgrade path for specific version of Mastodon
@@ -134,6 +142,7 @@
   when: 
   - mastodon_version != "latest"
   - mastodon_is_git.stat.exists
+  - mastodon_install_exists.stat.exists
   - local_minor_ver.stdout != specific_mastodon_tag_minor.stdout
 
 - name: Verify MAJOR upgrade path for Latest Mastodon with allowed prerelease versions
@@ -146,6 +155,7 @@
   when: 
     - mastodon_version == "latest"
     - mastodon_allow_prerelease | bool
+    - mastodon_is_git.stat.exists
     - mastodon_install_exists.stat.exists
     - local_minor_ver.stdout != latest_mastodon_tag_rc_minor.stdout
 
@@ -160,5 +170,6 @@
     - mastodon_version == "latest"
     - mastodon_allow_prerelease | bool == false
     - mastodon_install_exists.stat.exists
+    - mastodon_is_git.stat.exists
     - local_minor_ver.stdout != latest_mastodon_tag_minor.stdout
 
