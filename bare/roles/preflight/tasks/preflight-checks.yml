@@ -1,0 +1,164 @@
+#We need different vars as register always fires off even when skipped
+#This creates a mess with duplicate tasks that do different things, but its required
+#Help wanted to clean up the preflight task
+
+- name: Check if a Mastodon installation already exists
+  stat:
+    path: "{{ mastodon_home }}/{{mastodon_path}}"
+  register: mastodon_install_exists
+
+- name: Verify that existing Mastodon installation is a valid git folder
+  stat:
+    path: "{{ mastodon_home }}/{{mastodon_path}}/.git"
+  register: mastodon_is_git
+  when:
+    - mastodon_install_exists.stat.exists
+
+- name: Verify upgrade path for specific version of Mastodon
+  fail:
+   msg: 
+   - "ERROR: A folder defined for Mastodon installation already exists but its not a valid git folder."
+   - "Halting playbook and bailing out to prevent a destructive operation."
+   - "If you think this is a mistake or you know what you're doing, set the run_preflight_checks variable to false"
+  when:
+  - mastodon_install_exists.stat.exists
+  - not mastodon_is_git.stat.exists
+
+- name: Get local major version
+  shell: "git tag --points-at HEAD | cut -c2-2"
+  args:
+    chdir: "{{ mastodon_home }}/{{ mastodon_path }}"
+  when:
+    - mastodon_is_git.stat.exists
+  register: local_major_ver
+
+- name: Get local minor version
+  shell: "git tag --points-at HEAD | cut -c4-4"
+  args:
+    chdir: "{{ mastodon_home }}/{{ mastodon_path }}"
+  when:
+    - mastodon_is_git.stat.exists
+  register: local_minor_ver
+
+- name: Fetch latest stable major Mastodon version number
+  shell: "git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' https://github.com/mastodon/mastodon.git | grep -v 'rc' | tail --lines=1 | cut -d '/' -f 3 | cut -c2-2"
+  when: 
+    - mastodon_version == "latest"
+    - mastodon_allow_prerelease | bool == false
+    - mastodon_is_git.stat.exists
+  register: latest_mastodon_tag_major
+
+- name: Fetch latest stable major Mastodon version number allowing release candidates 
+  shell: "git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' https://github.com/mastodon/mastodon.git | tail --lines=1 | cut -d '/' -f 3 | cut -c2-2"
+  when: 
+    - mastodon_version == "latest"
+    - mastodon_allow_prerelease | bool
+    - mastodon_is_git.stat.exists
+  register: latest_mastodon_tag_rc_major
+
+- name: Fetch latest minor stable Mastodon version number
+  shell: "git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' https://github.com/mastodon/mastodon.git | grep -v 'rc' | tail --lines=1 | cut -d '/' -f 3 | cut -c4-4"
+  when: 
+    - mastodon_version == "latest"
+    - mastodon_allow_prerelease | bool == false
+    - mastodon_is_git.stat.exists
+  register: latest_mastodon_tag_minor
+
+- name: Fetch latest minor stable Mastodon version number allowing release candidates 
+  shell: "git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' https://github.com/mastodon/mastodon.git | tail --lines=1 | cut -d '/' -f 3 | cut -c4-4"
+  when: 
+    - mastodon_version == "latest"
+    - mastodon_allow_prerelease | bool
+    - mastodon_is_git.stat.exists
+  register: latest_mastodon_tag_rc_minor
+
+- name: Fetch specified major Mastodon version number
+  shell: "echo '{{ mastodon_version }}' | cut -c2-2"
+  when: 
+    - mastodon_version != "latest"
+    - mastodon_is_git.stat.exists
+  register: specific_mastodon_tag_major
+
+- name: Fetch specified minor Mastodon version number
+  shell: "echo '{{ mastodon_version }}' | cut -c4-4"
+  when: 
+    - mastodon_version != "latest"
+    - mastodon_is_git.stat.exists
+  register: specific_mastodon_tag_minor
+
+- name: Verify MAJOR upgrade path for specific version of Mastodon
+  fail:
+   msg:
+   - "ERROR: You are attempting to perform a MAJOR version upgrade that is not supported for automation!"
+   - "It is HEAVILY recommended to do the upgrade by hand by following the upgrade instructions listed in the Mastodon release notes!"
+   - "Halting playbook and bailing out to prevent a destructive operation."
+   - "If you think this is a mistake or you know what you're doing, set the run_preflight_checks variable to false"
+  when: 
+  - mastodon_version != "latest"
+  - mastodon_is_git.stat.exists
+  - local_major_ver.stdout != specific_mastodon_tag_major.stdout
+
+- name: Verify MAJOR upgrade path for Latest Mastodon with allowed prerelease versions
+  fail:
+   msg:
+   - "ERROR: You are attempting to perform a MAJOR version upgrade that is not supported for automation!"
+   - "It is HEAVILY recommended to do the upgrade by hand by following the upgrade instructions listed in the Mastodon release notes!"
+   - "Halting playbook and bailing out to prevent a destructive operation."
+   - "If you think this is a mistake or you know what you're doing, set the run_preflight_checks variable to false"
+  when: 
+    - mastodon_version == "latest"
+    - mastodon_allow_prerelease | bool
+    - mastodon_install_exists.stat.exists
+    - local_major_ver.stdout != latest_mastodon_tag_rc_major.stdout
+
+- name: Verify MAJOR upgrade path for Latest Mastodon
+  fail:
+   msg:
+   - "ERROR: You are attempting to perform a MAJOR version upgrade that is not supported for automation!"
+   - "It is HEAVILY recommended to do the upgrade by hand by following the upgrade instructions listed in the Mastodon release notes!"
+   - "Halting playbook and bailing out to prevent a destructive operation."
+   - "If you think this is a mistake or you know what you're doing, set the run_preflight_checks variable to false"
+  when: 
+    - mastodon_version == "latest"
+    - mastodon_allow_prerelease | bool == false
+    - mastodon_install_exists.stat.exists
+    - local_major_ver.stdout != latest_mastodon_tag_major.stdout
+
+- name: Verify MINOR upgrade path for specific version of Mastodon
+  fail:
+   msg:
+   - "ERROR: You are attempting to perform a MINOR version upgrade that is not recommended to be upgraded by automation!"
+   - "It is HEAVILY recommended to do the upgrade by hand by following the upgrade instructions listed in the Mastodon release notes!"
+   - "Halting playbook and bailing out to prevent a destructive operation."
+   - "If you think this is a mistake or you know what you're doing, set the run_preflight_checks variable to false"
+  when: 
+  - mastodon_version != "latest"
+  - mastodon_is_git.stat.exists
+  - local_minor_ver.stdout != specific_mastodon_tag_minor.stdout
+
+- name: Verify MAJOR upgrade path for Latest Mastodon with allowed prerelease versions
+  fail:
+   msg:
+   - "ERROR: You are attempting to perform a MINOR version upgrade that is not recommended to be upgraded by automation!"
+   - "It is HEAVILY recommended to do the upgrade by hand by following the upgrade instructions listed in the Mastodon release notes!"
+   - "Halting playbook and bailing out to prevent a destructive operation."
+   - "If you think this is a mistake or you know what you're doing, set the run_preflight_checks variable to false"
+  when: 
+    - mastodon_version == "latest"
+    - mastodon_allow_prerelease | bool
+    - mastodon_install_exists.stat.exists
+    - local_minor_ver.stdout != latest_mastodon_tag_rc_minor.stdout
+
+- name: Verify MINOR upgrade path for Latest Mastodon
+  fail:
+   msg:
+   - "ERROR: You are attempting to perform a MINOR version upgrade that is not recommended to be upgraded by automation!"
+   - "It is HEAVILY recommended to do the upgrade by hand by following the upgrade instructions listed in the Mastodon release notes!"
+   - "Halting playbook and bailing out to prevent a destructive operation."
+   - "If you think this is a mistake or you know what you're doing, set the run_preflight_checks variable to false"
+  when: 
+    - mastodon_version == "latest"
+    - mastodon_allow_prerelease | bool == false
+    - mastodon_install_exists.stat.exists
+    - local_minor_ver.stdout != latest_mastodon_tag_minor.stdout
+

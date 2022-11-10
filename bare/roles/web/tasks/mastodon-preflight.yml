@@ -1,0 +1,45 @@
+#We need different vars as register always fires off even when skipped
+#This creates a mess with duplicate tasks that do different things, but its required
+
+- name: Fetch latest stable Mastodon version number
+  shell: "git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' https://github.com/mastodon/mastodon.git | grep -v 'rc' | tail --lines=1 | cut -d '/' -f 3"
+  when: 
+    - mastodon_version == "latest"
+    - mastodon_allow_prerelease | bool == false
+  register: latest_mastodon_tag
+
+- name: Fetch latest stable Mastodon version number allowing release candidates 
+  shell: "git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' https://github.com/mastodon/mastodon.git | tail --lines=1 | cut -d '/' -f 3"
+  when: 
+    - mastodon_version == "latest"
+    - mastodon_allow_prerelease | bool
+  register: latest_mastodon_tag_rc
+
+- name: Clone Specific version of Mastodon
+  git:
+    repo: "https://github.com/mastodon/mastodon.git"
+    dest: "{{ mastodon_home }}/{{mastodon_path}}"
+    clone: true
+    version: "{{ mastodon_version }}"
+  when: mastodon_version != "latest"
+
+- name: Clone Latest Mastodon with allowed prerelease versions
+  git:
+    repo: "https://github.com/mastodon/mastodon.git"
+    dest: "{{ mastodon_home }}/{{mastodon_path}}"
+    clone: true
+    version: "{{ latest_mastodon_tag_rc.stdout }}"
+  when: 
+    - mastodon_version == "latest"
+    - mastodon_allow_prerelease | bool
+
+- name: Clone Latest Mastodon
+  git:
+    repo: "https://github.com/mastodon/mastodon.git"
+    dest: "{{ mastodon_home }}/{{mastodon_path}}"
+    clone: true
+    version: "{{ latest_mastodon_tag.stdout }}"
+  when: 
+    - mastodon_version == "latest"
+    - mastodon_allow_prerelease | bool == false
+

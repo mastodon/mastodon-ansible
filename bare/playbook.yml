@@ -6,6 +6,17 @@
   roles:
     - init
 
+- name: Preflight Checks
+  gather_facts: True
+  hosts: all
+  vars_files:
+    - "vars/common.yml"
+  roles:
+    - preflight
+  tags:
+    - preflight
+
+
 - hosts: all
   vars_files:
     - "vars/common.yml"

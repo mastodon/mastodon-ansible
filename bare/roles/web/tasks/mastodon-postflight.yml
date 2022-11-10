@@ -1,18 +1,3 @@
-- name: Fetch latest Mastodon version number
-  shell: "git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' https://github.com/mastodon/mastodon.git | grep -v 'rc' | tail --lines=1 | cut --delimiter='/' --fields=3"
-  register: latest_mastodon_tag
-
-- name: Clone Mastodon
-  git:
-    repo: "https://github.com/mastodon/mastodon.git"
-    dest: "{{ mastodon_home }}/{{mastodon_path}}"
-    clone: true
-    version: "{{ latest_mastodon_tag.stdout }}"
-
-# - name: Update to latest version
-#   shell: "git fetch; git checkout $(git tag -l | grep -v 'rc[0-9]*$' | sort -V | tail -n 1)"
-#   args:
-#     chdir: "{{ mastodon_home }}/{{ mastodon_path }}"
 
 - name: Bundle install
   shell: "

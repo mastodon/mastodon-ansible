@@ -1,0 +1,5 @@
+- include_tasks: preflight-checks.yml
+  args:
+    apply:
+      become: true
+  when: run_preflight_checks | bool
