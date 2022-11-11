@@ -59,7 +59,7 @@ command:
     exit-status: 0
     exec: "sudo -u mastodon -i ruby -v"
     stdout:
-      - "3.0.3"
+      - "3.0.4"
   crontab:
     exit-status: 0
     exec: "sudo crontab -l -u mastodon"
