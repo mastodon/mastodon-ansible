@@ -76,7 +76,7 @@ Vagrant.configure('2') do |config|
   end
 
   config.vm.define 'rhel8', autostart: false do |bare|
-    bare.vm.box = 'rockylinux/8'
+    bare.vm.box = 'geerlingguy/rockylinux8'
     bare.vm.network 'private_network', type: 'dhcp'
     bare.vm.provision 'ansible_local' do |ansible|
       ansible.playbook = 'bare/playbook.yml'

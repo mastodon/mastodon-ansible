@@ -123,11 +123,24 @@
 
 #https://github.com/nodejs/node/issues/40455
 #It's possible that this is a bug with ruby 3.0.3 and gets fixed with Mastodon 4.0.0
-- name: Precompile assets with Legacy OpenSSL provider
+- name: Precompile assets with Legacy OpenSSL provider for RHEL9
   shell: "NODE_OPTIONS=--openssl-legacy-provider RAILS_ENV=production ~/.rbenv/shims/bundle exec rails assets:precompile"
   args:
     chdir: "{{ mastodon_home }}/{{ mastodon_path }}"
-  when: (ansible_os_family == "RedHat" and ansible_facts['distribution_major_version'] == "9") or (ansible_facts['distribution'] == 'Ubuntu' and ansible_facts['distribution_release'] == 'jammy')
+  when: 
+  - ansible_os_family == "RedHat"
+  - ansible_facts['distribution_major_version'] == "9"
+
+#https://github.com/microsoft/vscode/issues/136599#issuecomment-963074858
+#Running in blind, can't test this
+- name: Precompile assets with Legacy OpenSSL provider for Ubuntu Jammy
+  shell: "unset NODE_OPTIONS; NODE_OPTIONS=--openssl-legacy-provider RAILS_ENV=production ~/.rbenv/shims/bundle exec rails assets:precompile"
+  args:
+    chdir: "{{ mastodon_home }}/{{ mastodon_path }}"
+  when: 
+  - ansible_facts['distribution'] == 'Ubuntu'
+  - ansible_facts['distribution_release'] == 'jammy'
+
 
 - name: Precompile assets
   shell: "RAILS_ENV=production ~/.rbenv/shims/bundle exec rails assets:precompile"
