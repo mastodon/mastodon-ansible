@@ -24,3 +24,10 @@
 #    link: /usr/bin/node
 #    path: /usr/bin/nodejs
 #  when: ansible_os_family == "Debian"
+
+- name: Install Perl for building OpenSSL 1.1
+  become: yes
+  package:
+    name: "perl"
+    state: present
+  when: (ansible_os_family == "RedHat" and ansible_facts['distribution_major_version'] == "9") or (ansible_facts['distribution'] == 'Ubuntu' and ansible_facts['distribution_release'] == 'jammy')

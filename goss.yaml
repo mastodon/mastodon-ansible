@@ -56,10 +56,13 @@ service:
 
 command:
   ruby:
+  #Future proofing for 4.x that uses ruby 3.0.4
+  #Apparently this is how you're supposed to use regex with goss
+  #https://github.com/aelsabbahy/goss/blob/master/docs/manual.md#patterns
     exit-status: 0
     exec: "sudo -u mastodon -i ruby -v"
     stdout:
-      - "3.0.4"
+      - "/3.0.[3-4]/"
   crontab:
     exit-status: 0
     exec: "sudo crontab -l -u mastodon"

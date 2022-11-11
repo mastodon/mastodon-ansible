@@ -1,17 +1,30 @@
 ---
-- name: Clone rbenv
+
+- name: Fetch Ruby version required by Mastodon
+  shell: "cat {{ mastodon_home }}/{{ mastodon_path }}/.ruby-version"
+  register: ruby_version
+
+- name: Fetch latest tagged release of rbenv
+  shell: "git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' https://github.com/rbenv/rbenv.git | tail --lines=1 | cut -d '/' -f 3"
+  register: rbenv_version
+
+- name: Fetch latest tagged release of ruby-build
+  shell: "git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' https://github.com/rbenv/ruby-build.git | tail --lines=1 | cut -d '/' -f 3"
+  register: ruby_build_version
+
+- name: "Clone rbenv version {{ rbenv_version.stdout }}"
   git:
     repo: "https://github.com/rbenv/rbenv.git"
     dest: "~/.rbenv"
     clone: true
-    version: "{{ rbenv_version }}"
+    version: "{{ rbenv_version.stdout }}"
 
-- name: Clone ruby-build
+- name: "Clone ruby-build version {{ ruby_build_version.stdout }}"
   git:
     repo: "https://github.com/rbenv/ruby-build.git"
     dest: "~/.rbenv/plugins/ruby-build"
     clone: true
-    version: "{{ ruby_build_version }}"
+    version: "{{ ruby_build_version.stdout }}"
   register: ruby_build
 
 - name: Configure rbenv
@@ -34,25 +47,27 @@
       eval "$(rbenv init -)"
 
 - name: Check if the Ruby version is already installed
-  shell: "~/.rbenv/bin/rbenv versions | grep -q {{ ruby_version }}"
+  shell: "~/.rbenv/bin/rbenv versions | grep -q {{ ruby_version.stdout }}"
   register: ruby_installed
   ignore_errors: yes
   check_mode: no
 
-- name: Install Ruby {{ ruby_version }}
-  shell: "~/.rbenv/bin/rbenv install {{ ruby_version }}"
+- name: Install Ruby {{ ruby_version.stdout }}
+  shell: "~/.rbenv/bin/rbenv install {{ ruby_version.stdout }}"
   args:
     executable: /bin/bash
   when: ruby_installed is failed
 
-- name: Set the default Ruby version to {{ ruby_version }}
-  shell: "~/.rbenv/bin/rbenv global {{ ruby_version }}"
+- name: Set the default Ruby version to {{ ruby_version.stdout }}
+  shell: "~/.rbenv/bin/rbenv global {{ ruby_version.stdout }}"
   args:
     executable: /bin/bash
   register: default_ruby_version
 
+#Locking the Bundler version by itself is no longer required
+#https://bundler.io/blog/2022/01/23/bundler-v2-3.html
 - name: Install bundler
-  shell: 'export PATH="$HOME/.rbenv/bin:$PATH"; eval "$(rbenv init -)"; gem install bundler:{{ bundler_version }}'
+  shell: 'export PATH="$HOME/.rbenv/bin:$PATH"; eval "$(rbenv init -)"; gem install bundler'
   args:
     executable: /bin/bash
   when: default_ruby_version is succeeded

@@ -5,9 +5,9 @@
     apply:
       become: true
 
-- include_tasks: nodejs.yml
-
 - include_tasks: repositories.yml
+
+- include_tasks: nodejs.yml
 
 - include_tasks: packages.yml
   args:
@@ -33,6 +33,12 @@
   when: 
   - ansible_os_family == "RedHat"
 
+- include_tasks: mastodon-preflight.yml
+  args:
+    apply:
+      become: true
+      become_user: mastodon
+
 - include_tasks: ruby.yml
   args:
     apply:
@@ -44,7 +50,7 @@
 - include_tasks: selfsigned-ssl.yml
   when: disable_letsencrypt | bool
 
-- include_tasks: mastodon.yml
+- include_tasks: mastodon-postflight.yml
   args:
     apply:
       become: true

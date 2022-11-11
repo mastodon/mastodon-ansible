@@ -1,10 +1,10 @@
-#rbenv: version `3.0.4' is not installed (set by /home/mastodon/live/.ruby-version)
-ruby_version: "3.0.4"
-rbenv_version: "v1.2.0"
-ruby_build_version: "v20220426"
-bundler_version: "2.1.4"
+run_preflight_checks: "true"
 node_major_version: "16"
 os_family: "{{ ansible_os_family|lower }}"
+#Please list a valid name of the tag from Mastodon's Github.
+#Accepted format is "vX.X.XrcX"
+mastodon_version: "latest" 
+mastodon_allow_prerelease: "false"
 mastodon_user: "mastodon"
 mastodon_home: "/home/{{ mastodon_user }}"
 mastodon_db_user: "{{ mastodon_user }}"

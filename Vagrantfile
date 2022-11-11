@@ -10,7 +10,8 @@ install_goss = <<~SHELL
 SHELL
 
 #Fix for https://github.com/mastodon/mastodon-ansible/pull/33#issuecomment-1126071199
-postgres_use_md5 = <<~SHELL
+postgres_use_md5 = <<-'SHELL'
+echo "Running PostgreSQL commands required for testing"
 sudo sed -i 's/host\s\s\s\sall\s\s\s\s\s\s\s\s\s\s\s\s\sall\s\s\s\s\s\s\s\s\s\s\s\s\s127.0.0.1\/32\s\s\s\s\s\s\s\s\s\s\s\sident/host    all             all             127.0.0.1\/32                 md5/g' /var/lib/pgsql/data/pg_hba.conf
 sudo sed -i 's/host\s\s\s\sall\s\s\s\s\s\s\s\s\s\s\s\s\sall\s\s\s\s\s\s\s\s\s\s\s\s\s::1\/128\s\s\s\s\s\s\s\s\s\s\s\s\s\s\s\s\sident/host    all             all             ::1\/128                 md5/g' /var/lib/pgsql/data/pg_hba.conf
 sudo systemctl restart postgresql
@@ -38,6 +39,9 @@ Vagrant.configure('2') do |config|
     # %w[hwvirtex vtxvpid vtxux].each do |instruction|
     #   vb.customize ["modifyvm", :id, "--#{instruction}", "off"]
     # end if ENV['CI'] == "true"
+  end
+  config.vm.provider 'vmware_fusion' do |vb|
+    vb.memory = '4096'
   end
 
   [
@@ -72,7 +76,7 @@ Vagrant.configure('2') do |config|
     end
   end
 
-  config.vm.define 'rhel', autostart: false do |bare|
+  config.vm.define 'rhel8', autostart: false do |bare|
     bare.vm.box = 'geerlingguy/rockylinux8'
     bare.vm.network 'private_network', type: 'dhcp'
     bare.vm.provision 'ansible_local' do |ansible|
@@ -81,6 +85,12 @@ Vagrant.configure('2') do |config|
       ansible.verbose = true
       ansible.skip_tags = 'letsencrypt'
     end
+    
+    #We can't have two shell.inline for some reason or the first one won't run
+    bare.vm.provision 'shell' do |shell|
+      shell.privileged = true
+      shell.inline = postgres_use_md5 
+    end
 
     bare.vm.provision 'shell' do |shell|
       shell.privileged = true
@@ -88,7 +98,35 @@ Vagrant.configure('2') do |config|
         'TARGET' => 'rhel'
       }
       shell.inline = install_goss
-      shell.inline = postgres_use_md5
+    end
+  end
+
+  config.vm.define 'rhel9', autostart: false do |bare|
+    bare.vm.box = 'generic/rocky9'
+    bare.vm.network 'private_network', type: 'dhcp'
+    #Not specifying this results in
+    #this error to be displayed "`playbook` does not exist on the guest: /vagrant/bare/playbook.yml error"
+    #The generic image might be a just a little bit broken, but rockylinux/9 is not ready yet
+    bare.vm.synced_folder ".", "/vagrant"
+    bare.vm.provision 'ansible_local' do |ansible|
+      ansible.playbook = 'bare/playbook.yml'
+      ansible.extra_vars = ansible_extra_vars
+      ansible.verbose = true
+      ansible.skip_tags = 'letsencrypt'
+    end
+
+    #We can't have two shell.inline for some reason or the first one won't run
+    bare.vm.provision 'shell' do |shell|
+      shell.privileged = true
+      shell.inline = postgres_use_md5 
+    end
+
+    bare.vm.provision 'shell' do |shell|
+      shell.privileged = true
+      shell.env = {
+        'TARGET' => 'rhel'
+      }
+      shell.inline = install_goss
     end
   end
 end
