@@ -11,6 +11,7 @@ SHELL
 
 #Fix for https://github.com/mastodon/mastodon-ansible/pull/33#issuecomment-1126071199
 postgres_use_md5 = <<-'SHELL'
+echo "Running PostgreSQL commands required for testing"
 sudo sed -i 's/host\s\s\s\sall\s\s\s\s\s\s\s\s\s\s\s\s\sall\s\s\s\s\s\s\s\s\s\s\s\s\s127.0.0.1\/32\s\s\s\s\s\s\s\s\s\s\s\sident/host    all             all             127.0.0.1\/32                 md5/g' /var/lib/pgsql/data/pg_hba.conf
 sudo sed -i 's/host\s\s\s\sall\s\s\s\s\s\s\s\s\s\s\s\s\sall\s\s\s\s\s\s\s\s\s\s\s\s\s::1\/128\s\s\s\s\s\s\s\s\s\s\s\s\s\s\s\s\sident/host    all             all             ::1\/128                 md5/g' /var/lib/pgsql/data/pg_hba.conf
 sudo systemctl restart postgresql
@@ -84,6 +85,12 @@ Vagrant.configure('2') do |config|
       ansible.verbose = true
       ansible.skip_tags = 'letsencrypt'
     end
+    
+    #We can't have two shell.inline for some reason or the first one won't run
+    bare.vm.provision 'shell' do |shell|
+      shell.privileged = true
+      shell.inline = postgres_use_md5 
+    end
 
     bare.vm.provision 'shell' do |shell|
       shell.privileged = true
@@ -91,7 +98,6 @@ Vagrant.configure('2') do |config|
         'TARGET' => 'rhel'
       }
       shell.inline = install_goss
-      shell.inline = postgres_use_md5
     end
   end
 
@@ -109,13 +115,18 @@ Vagrant.configure('2') do |config|
       ansible.skip_tags = 'letsencrypt'
     end
 
+    #We can't have two shell.inline for some reason or the first one won't run
+    bare.vm.provision 'shell' do |shell|
+      shell.privileged = true
+      shell.inline = postgres_use_md5 
+    end
+
     bare.vm.provision 'shell' do |shell|
       shell.privileged = true
       shell.env = {
         'TARGET' => 'rhel'
       }
       shell.inline = install_goss
-      shell.inline = postgres_use_md5
     end
   end
 end
