@@ -10,7 +10,7 @@ install_goss = <<~SHELL
 SHELL
 
 #Fix for https://github.com/mastodon/mastodon-ansible/pull/33#issuecomment-1126071199
-postgres_use_md5 = <<~SHELL
+postgres_use_md5 = <<-'SHELL'
 sudo sed -i 's/host\s\s\s\sall\s\s\s\s\s\s\s\s\s\s\s\s\sall\s\s\s\s\s\s\s\s\s\s\s\s\s127.0.0.1\/32\s\s\s\s\s\s\s\s\s\s\s\sident/host    all             all             127.0.0.1\/32                 md5/g' /var/lib/pgsql/data/pg_hba.conf
 sudo sed -i 's/host\s\s\s\sall\s\s\s\s\s\s\s\s\s\s\s\s\sall\s\s\s\s\s\s\s\s\s\s\s\s\s::1\/128\s\s\s\s\s\s\s\s\s\s\s\s\s\s\s\s\sident/host    all             all             ::1\/128                 md5/g' /var/lib/pgsql/data/pg_hba.conf
 sudo systemctl restart postgresql
