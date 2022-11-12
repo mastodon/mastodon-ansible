@@ -1,7 +1,5 @@
 goss_version = '0.3.16'
 install_goss = <<~SHELL
-  echo "Giving NGINX a minute to restart before running tests" 
-  sleep 60
   echo "Running Goss tests:"
   echo "The target is \$TARGET" && \
   curl -Lo /tmp/goss https://github.com/aelsabbahy/goss/releases/download/v#{goss_version}/goss-linux-amd64 && \

@@ -177,3 +177,7 @@
   service: name=nginx state=restarted
   tags:
     - systemd
+
+- name: Wait for 1 minute for NGINX to start fully
+  pause:
+    minutes: 1
