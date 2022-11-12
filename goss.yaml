@@ -81,6 +81,11 @@ command:
   postgres:
     exit-status: 0
     exec: "PGPASSWORD=CHANGEME psql -d mastodon_instance -h 127.0.0.1 -U mastodon -c 'CREATE TABLE test (v varchar(20)); DROP TABLE test;'"
+  #A Mastodon instance that is not running correctly will throw 500 and will not display the configured hostname
+  #Grepping for any mention of mastodon.local and returning status 0 if found is a good way to find out if the instance is running
+  curl:
+    exit-status: 0
+    exec: "curl -s --insecure https://mastodon.local/about | grep -q mastodon.local"
 
 user:
   mastodon:
