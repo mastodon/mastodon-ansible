@@ -22,6 +22,8 @@
   - mastodon_install_exists.stat.exists
   - not mastodon_is_git.stat.exists
 
+#Have to run it under Mastodon user due of Git Security changes in newer OSes
+#https://github.blog/2022-04-12-git-security-vulnerability-announced/
 - name: Get local major version
   shell: "git tag --points-at HEAD | cut -c2-2"
   args:
@@ -29,8 +31,12 @@
   when:
     - mastodon_install_exists.stat.exists
     - mastodon_is_git.stat.exists
+  become: true
+  become_user: mastodon
   register: local_major_ver
 
+#Have to run it under Mastodon user due of Git Security changes in newer OSes
+#https://github.blog/2022-04-12-git-security-vulnerability-announced/
 - name: Get local minor version
   shell: "git tag --points-at HEAD | cut -c4-4"
   args:
@@ -39,6 +45,8 @@
     - mastodon_install_exists.stat.exists
     - mastodon_is_git.stat.exists
   register: local_minor_ver
+  become: true
+  become_user: mastodon
 
 - name: Fetch latest stable major Mastodon version number
   shell: "git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' https://github.com/mastodon/mastodon.git | grep -v 'rc' | tail --lines=1 | cut -d '/' -f 3 | cut -c2-2"

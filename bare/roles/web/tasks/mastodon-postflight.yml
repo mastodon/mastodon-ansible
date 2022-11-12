@@ -131,22 +131,11 @@
   - ansible_os_family == "RedHat"
   - ansible_facts['distribution_major_version'] == "9"
 
-#https://github.com/microsoft/vscode/issues/136599#issuecomment-963074858
-#Running in blind, can't test this
-- name: Precompile assets with Legacy OpenSSL provider for Ubuntu Jammy
-  shell: "unset NODE_OPTIONS; NODE_OPTIONS=--openssl-legacy-provider RAILS_ENV=production ~/.rbenv/shims/bundle exec rails assets:precompile"
-  args:
-    chdir: "{{ mastodon_home }}/{{ mastodon_path }}"
-  when: 
-  - ansible_facts['distribution'] == 'Ubuntu'
-  - ansible_facts['distribution_release'] == 'jammy'
-
-
 - name: Precompile assets
   shell: "RAILS_ENV=production ~/.rbenv/shims/bundle exec rails assets:precompile"
   args:
     chdir: "{{ mastodon_home }}/{{ mastodon_path }}"
-  when: not (ansible_os_family == "RedHat" and ansible_facts['distribution_major_version'] == "9") or (ansible_facts['distribution'] == 'Ubuntu' and ansible_facts['distribution_release'] == 'jammy')
+  when: not ansible_os_family == "RedHat" and ansible_facts['distribution_major_version'] == "9"
 #We are installing new .env file, checking if .env file exists no longer required
 #  when: production_config.stat.exists
 

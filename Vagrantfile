@@ -1,5 +1,6 @@
 goss_version = '0.3.16'
 install_goss = <<~SHELL
+  echo "Running Goss tests:"
   echo "The target is \$TARGET" && \
   curl -Lo /tmp/goss https://github.com/aelsabbahy/goss/releases/download/v#{goss_version}/goss-linux-amd64 && \
   echo "827e354b48f93bce933f5efcd1f00dc82569c42a179cf2d384b040d8a80bfbfb  /tmp/goss" | sha256sum -c --strict - && \
@@ -15,6 +16,11 @@ echo "Running PostgreSQL commands required for testing"
 sudo sed -i 's/host\s\s\s\sall\s\s\s\s\s\s\s\s\s\s\s\s\sall\s\s\s\s\s\s\s\s\s\s\s\s\s127.0.0.1\/32\s\s\s\s\s\s\s\s\s\s\s\sident/host    all             all             127.0.0.1\/32                 md5/g' /var/lib/pgsql/data/pg_hba.conf
 sudo sed -i 's/host\s\s\s\sall\s\s\s\s\s\s\s\s\s\s\s\s\sall\s\s\s\s\s\s\s\s\s\s\s\s\s::1\/128\s\s\s\s\s\s\s\s\s\s\s\s\s\s\s\s\sident/host    all             all             ::1\/128                 md5/g' /var/lib/pgsql/data/pg_hba.conf
 sudo systemctl restart postgresql
+SHELL
+
+localhost_domain = <<-'SHELL'
+echo "Set localhost to answer to mastodon.local"
+echo "127.0.0.1       mastodon.local" >> /etc/hosts
 SHELL
 
 ansible_extra_vars = {
@@ -58,12 +64,19 @@ Vagrant.configure('2') do |config|
   ].each do |d|
     config.vm.define d[:name], primary: d[:primary], autostart: d[:autostart] do |bare|
       bare.vm.box = "ubuntu/#{d[:name]}64"
+      #MacOS Ventura workaround
+      #bare.vm.network :private_network, type: 'dhcp', name: "HostOnly", virtualbox__intnet: true
       bare.vm.network 'private_network', type: 'dhcp'
       bare.vm.provision 'ansible_local' do |ansible|
         ansible.playbook = 'bare/playbook.yml'
         ansible.extra_vars = ansible_extra_vars
         ansible.verbose = true
         ansible.skip_tags = 'letsencrypt'
+      end
+
+      bare.vm.provision 'shell' do |shell|
+        shell.privileged = true
+        shell.inline = localhost_domain
       end
 
       bare.vm.provision 'shell' do |shell|
@@ -94,6 +107,11 @@ Vagrant.configure('2') do |config|
 
     bare.vm.provision 'shell' do |shell|
       shell.privileged = true
+      shell.inline = localhost_domain
+    end
+
+    bare.vm.provision 'shell' do |shell|
+      shell.privileged = true
       shell.env = {
         'TARGET' => 'rhel'
       }
@@ -119,6 +137,11 @@ Vagrant.configure('2') do |config|
     bare.vm.provision 'shell' do |shell|
       shell.privileged = true
       shell.inline = postgres_use_md5 
+    end
+
+    bare.vm.provision 'shell' do |shell|
+      shell.privileged = true
+      shell.inline = localhost_domain
     end
 
     bare.vm.provision 'shell' do |shell|
