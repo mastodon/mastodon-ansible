@@ -135,7 +135,7 @@
   shell: "RAILS_ENV=production ~/.rbenv/shims/bundle exec rails assets:precompile"
   args:
     chdir: "{{ mastodon_home }}/{{ mastodon_path }}"
-  when: not ansible_os_family == "RedHat" and ansible_facts['distribution_major_version'] == "9"
+  when: not (ansible_os_family == "RedHat" and ansible_facts['distribution_major_version'] == "9")
 #We are installing new .env file, checking if .env file exists no longer required
 #  when: production_config.stat.exists
 

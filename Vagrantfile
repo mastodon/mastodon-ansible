@@ -20,9 +20,12 @@ sudo sed -i 's/host\s\s\s\sall\s\s\s\s\s\s\s\s\s\s\s\s\sall\s\s\s\s\s\s\s\s\s\s\
 sudo systemctl restart postgresql
 SHELL
 
+#Need to run this under root for it to stick and not throw permission errors
 localhost_domain = <<-'SHELL'
 echo "Set localhost to answer to mastodon.local"
+sudo su
 echo "127.0.0.1       mastodon.local" >> /etc/hosts
+exit
 SHELL
 
 ansible_extra_vars = {
