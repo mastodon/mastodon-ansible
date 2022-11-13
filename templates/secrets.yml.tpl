@@ -1,5 +1,5 @@
 ---
 
-local_domain: 'mastodon.local',
-mastodon_db_password: "CHANGEME"
-redis_pass: 'CHANGEME',
+local_domain: 'mastodon.local'
+mastodon_db_password: 'CHANGEME'
+redis_pass: 'CHANGEME'
