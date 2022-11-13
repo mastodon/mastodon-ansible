@@ -8,13 +8,12 @@
 
 - name: Install packages
   package:
-    name: "{{ item.package }}"
+    name: "{{ packages | map(attribute='package') }}"
     update_cache: no
     #This makes the package module non-OS generic
     #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/package_module.html
     #    state: latest
     #    install_recommends: no
-  with_items: "{{ packages }}"
 
 #RHEL and Debian already has NodeJS in /usr/bin/node
 #Unclear what this is supposed to fix
