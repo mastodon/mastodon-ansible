@@ -19,7 +19,7 @@
   command: "systemctl reload nginx"
 
 - name: Install letsencrypt cert
-  command: letsencrypt certonly -n --webroot -d {{ mastodon_host }} -w {{ mastodon_home }}/{{ mastodon_path }}/public/ --email "webmaster@{{ mastodon_host }}" --agree-tos && systemctl reload nginx
+  command: letsencrypt certonly -n --webroot -d {{ mastodon_host }} -w {{ mastodon_home }}/{{ mastodon_path }}/public/ --email "webmaster@{{ mastodon_host }}" --agree-tos
   when: not letsencrypt_cert.stat.exists
 
 - name: Letsencrypt Job
