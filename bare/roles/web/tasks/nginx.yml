@@ -177,3 +177,12 @@
   service: name=nginx state=restarted
   tags:
     - systemd
+
+- name: Check if Mastodon instance is up and running
+  uri:
+    url: 'https://{{ mastodon_host }}/about'
+    validate_certs: no
+  register: result
+  until: 'result.status == 200'
+  retries: 5
+  delay: 5
