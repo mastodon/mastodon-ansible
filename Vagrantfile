@@ -70,16 +70,19 @@ Vagrant.configure('2') do |config|
       #MacOS Ventura workaround
       #bare.vm.network :private_network, type: 'dhcp', name: "HostOnly", virtualbox__intnet: true
       bare.vm.network 'private_network', type: 'dhcp'
+
+      #Needs to be ran before running the playbook or Ansible checks will fail
+      #as we are checking against non-valid FQDN
+      bare.vm.provision 'shell' do |shell|
+        shell.privileged = true
+        shell.inline = localhost_domain
+      end
+
       bare.vm.provision 'ansible_local' do |ansible|
         ansible.playbook = 'bare/playbook.yml'
         ansible.extra_vars = ansible_extra_vars
         ansible.verbose = true
         ansible.skip_tags = 'letsencrypt'
-      end
-
-      bare.vm.provision 'shell' do |shell|
-        shell.privileged = true
-        shell.inline = localhost_domain
       end
 
       bare.vm.provision 'shell' do |shell|
@@ -94,7 +97,17 @@ Vagrant.configure('2') do |config|
 
   config.vm.define 'rhel8', autostart: false do |bare|
     bare.vm.box = 'geerlingguy/rockylinux8'
-    bare.vm.network 'private_network', type: 'dhcp'
+      #MacOS Ventura workaround
+      #bare.vm.network :private_network, type: 'dhcp', name: "HostOnly", virtualbox__intnet: true
+      bare.vm.network 'private_network', type: 'dhcp'
+
+    #Needs to be ran before running the playbook or Ansible checks will fail
+    #as we are checking against non-valid FQDN
+    bare.vm.provision 'shell' do |shell|
+      shell.privileged = true
+      shell.inline = localhost_domain
+    end
+
     bare.vm.provision 'ansible_local' do |ansible|
       ansible.playbook = 'bare/playbook.yml'
       ansible.extra_vars = ansible_extra_vars
@@ -106,11 +119,6 @@ Vagrant.configure('2') do |config|
     bare.vm.provision 'shell' do |shell|
       shell.privileged = true
       shell.inline = postgres_use_md5 
-    end
-
-    bare.vm.provision 'shell' do |shell|
-      shell.privileged = true
-      shell.inline = localhost_domain
     end
 
     bare.vm.provision 'shell' do |shell|
@@ -129,6 +137,14 @@ Vagrant.configure('2') do |config|
     #this error to be displayed "`playbook` does not exist on the guest: /vagrant/bare/playbook.yml error"
     #The generic image might be a just a little bit broken, but rockylinux/9 is not ready yet
     bare.vm.synced_folder ".", "/vagrant"
+
+    #Needs to be ran before running the playbook or Ansible checks will fail
+    #as we are checking against non-valid FQDN
+    bare.vm.provision 'shell' do |shell|
+      shell.privileged = true
+      shell.inline = localhost_domain
+    end
+
     bare.vm.provision 'ansible_local' do |ansible|
       ansible.playbook = 'bare/playbook.yml'
       ansible.extra_vars = ansible_extra_vars
@@ -140,11 +156,6 @@ Vagrant.configure('2') do |config|
     bare.vm.provision 'shell' do |shell|
       shell.privileged = true
       shell.inline = postgres_use_md5 
-    end
-
-    bare.vm.provision 'shell' do |shell|
-      shell.privileged = true
-      shell.inline = localhost_domain
     end
 
     bare.vm.provision 'shell' do |shell|
