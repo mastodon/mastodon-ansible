@@ -2,18 +2,31 @@
 - stat: path=/etc/letsencrypt/live/{{ mastodon_host }}/fullchain.pem
   register: letsencrypt_cert
 
-- name: Copy letsencrypt nginx config
+- name: Copy letsencrypt nginx config on Debian systems
   template: 
     src: ../files/nginx/letsencrypt.conf.j2
     dest: /etc/nginx/sites-available/mastodon.conf
-  when: not letsencrypt_cert.stat.exists
+  when:
+    - ansible_os_family == "Debian"
+    - not letsencrypt_cert.stat.exists
   
-- name: Symlink enabled site
+- name: Symlink enabled site on Debian systems
   file:
     src: "/etc/nginx/sites-available/mastodon.conf"
     dest: "/etc/nginx/sites-enabled/mastodon.conf"
     state: link
-  when: not letsencrypt_cert.stat.exists
+  when:
+    - ansible_os_family == "Debian"
+    - not letsencrypt_cert.stat.exists
+
+- name: Copy and enable letsencrypt nginx config on RedHat systems
+  template: 
+    src: ../files/nginx/letsencrypt.conf.j2
+    dest: /etc/nginx/conf.d/mastodon.conf
+  when:
+    - ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
+    - not letsencrypt_cert.stat.exists
+
 
 - name: Reload nginx
   command: "systemctl reload nginx"
