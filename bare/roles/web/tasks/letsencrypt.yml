@@ -27,9 +27,8 @@
     - ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
     - not letsencrypt_cert.stat.exists
 
-
 - name: Reload nginx
-  command: "systemctl reload nginx"
+  command: "systemctl reload-or-restart nginx"
 
 - name: Install letsencrypt cert
   command: letsencrypt certonly -n --webroot -d {{ mastodon_host }} -w {{ mastodon_home }}/{{ mastodon_path }}/public/ --email "webmaster@{{ mastodon_host }}" --agree-tos
