@@ -7,12 +7,12 @@
     path: "/var/lib/pgsql/data/pg_hba.conf"
   register: postgres_data
   when:
-    - ansible_os_family == "RedHat"
+    - ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
 
 - name: "Initialize PostgreSQL"
   shell: "postgresql-setup initdb"
   when:
-    - ansible_os_family == "RedHat"
+    - ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
     - not postgres_data.stat.exists
 
 - name: "Start and enable services"

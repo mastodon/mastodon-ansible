@@ -14,7 +14,7 @@
     line: "requirepass {{ redis_pass }}"
     state: present
   when: 
-  - ansible_os_family == "RedHat" 
+  - ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
   - ansible_facts['distribution_major_version'] == "8"
 
 - name: Set Redis password for RHEL9 system
@@ -25,7 +25,7 @@
     line: "requirepass {{ redis_pass }}"
     state: present
   when: 
-  - ansible_os_family == "RedHat" 
+  - ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
   - ansible_facts['distribution_major_version'] == "9"  
 
 - name: Set Redis password for Debian system

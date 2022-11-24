@@ -1,0 +1,51 @@
+mastodon_db_login_unix_socket: '/var/run/postgresql'
+
+packages:
+
+  - package: "epel-release"
+  - package: "autoconf"
+  - package: "bison"
+  - package: "make"
+  - package: "curl"
+#  - package: "cron" installed by default
+  - package: "ffmpeg"
+  - package: "file"
+  - package: "gcc-c++"
+  - package: "gcc"
+  - package: "git"
+  - package: "ImageMagick"
+  - package: "libffi-devel"
+  - package: "gdbm-devel"
+  - package: "libicu-devel"
+  - package: "libidn-devel"
+  - package: "ncurses-devel"
+  - package: "libpq-devel"
+  - package: "protobuf-devel"
+  - package: "readline-devel"
+  - package: "openssl-devel"
+  - package: "libxml2-devel"
+  - package: "libxslt-devel"
+  - package: "libyaml-devel"
+  - package: "nginx"
+  #- package: "nodejs" see nodejs.yml
+  - package: "pkg-config"
+  - package: "protobuf-compiler"
+  - package: "sudo"
+  - package: "systemd"
+  - package: "firewalld"
+  - package: "dnf-automatic"
+  - package: "yarn"
+  - package: "zlib-devel"
+
+postgres:
+  packages:
+    - package: "libpq-devel"
+    - package: "postgresql"
+    - package: "postgresql-server"
+    - package: "postgresql-contrib"
+    - package: "python3-psycopg2"
+    - package: "sudo"
+
+redis:
+  packages:
+    - package: "redis"
