@@ -40,7 +40,7 @@ $ ansible-vault encrypt secrets.yml
 Then run the playbook as following:
 
 ```sh
-$ ansible-playbook playbook.yml --ask-vault-pass -i <your-host-here>, -u <remote-user> --ask-become-pass -e 'ansible_python_interpreter=/usr/bin/python3' --extra-vars="@secrets.yml"
+$ ansible-playbook bare/playbook.yml --ask-vault-pass -i <your-host-here>, -u <remote-user> --ask-become-pass -e 'ansible_python_interpreter=/usr/bin/python3' --extra-vars="@secrets.yml"
 ```
 
 If you prefer not to use Ansible Vault, you can run the playbook as following:
