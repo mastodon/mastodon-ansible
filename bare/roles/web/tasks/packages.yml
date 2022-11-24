@@ -29,4 +29,4 @@
   package:
     name: "perl"
     state: present
-  when: (ansible_os_family == "RedHat" and ansible_facts['distribution_major_version'] == "9") or (ansible_facts['distribution'] == 'Ubuntu' and ansible_facts['distribution_release'] == 'jammy')
+  when: ((ansible_os_family == "RedHat" or ansible_os_family == "Rocky") and ansible_facts['distribution_major_version'] == "9") or (ansible_facts['distribution'] == 'Ubuntu' and ansible_facts['distribution_release'] == 'jammy')

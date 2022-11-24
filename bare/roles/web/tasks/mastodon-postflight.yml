@@ -108,7 +108,7 @@
     group: "nginx"
     recurse: yes
   when:
-    - ansible_os_family == "RedHat"
+    - ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
 
 - name: Ensure that we have correct file permissions with owner being the user and www-data being the group
   become: yes
@@ -128,14 +128,14 @@
   args:
     chdir: "{{ mastodon_home }}/{{ mastodon_path }}"
   when: 
-  - ansible_os_family == "RedHat"
+  - ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
   - ansible_facts['distribution_major_version'] == "9"
 
 - name: Precompile assets
   shell: "RAILS_ENV=production ~/.rbenv/shims/bundle exec rails assets:precompile"
   args:
     chdir: "{{ mastodon_home }}/{{ mastodon_path }}"
-  when: not (ansible_os_family == "RedHat" and ansible_facts['distribution_major_version'] == "9")
+  when: not ((ansible_os_family == "RedHat"  or ansible_os_family == "Rocky") and ansible_facts['distribution_major_version'] == "9")
 #We are installing new .env file, checking if .env file exists no longer required
 #  when: production_config.stat.exists
 
