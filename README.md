@@ -46,7 +46,7 @@ $ ansible-playbook bare/playbook.yml --ask-vault-pass -i <your-host-here>, -u <r
 If you prefer not to use Ansible Vault, you can run the playbook as following:
 
 ```sh
-$ ansible-playbook playbook.yml -i <your-host-here>, -u <remote-user> --ask-become-pass -e 'ansible_python_interpreter=/usr/bin/python3' --extra-vars="mastodon_db_password=your-password redis_pass=your-password mastodon_host=example.com"
+$ ansible-playbook bare/playbook.yml -i <your-host-here>, -u <remote-user> --ask-become-pass -e 'ansible_python_interpreter=/usr/bin/python3' --extra-vars="mastodon_db_password=your-password redis_pass=your-password mastodon_host=example.com"
 ```
 
 The playbook is using `become` for some of its tasks, hence the user you connect to the instance with will have to have access to sudo. It should ask you for the password in due time.
@@ -77,7 +77,7 @@ By default, the playbook runs all of the roles defined here in sequence. You can
 Skipping the `postgres` role:
 
 ```sh
-$ ansible-playbook playbook.yml --skip-tags=postgres -i <your-host>, -u <your-user>
+$ ansible-playbook bare/playbook.yml --skip-tags=postgres -i <your-host>, -u <your-user>
 ```
 
 #### Preflight Checks
@@ -151,13 +151,13 @@ to configure these settings additionally:
 - Install PostgresSQL, create the database and user:
 
 ```sh
-$ ansible-playbook playbook -i <your-host-here>, -u <remote-user> --extra-vars="mastodon_db_password=your-password mastodon_db_login_unix_socket='/var/run/postgresql'"
+$ ansible-playbook bare/playbook.yml -i <your-host-here>, -u <remote-user> --extra-vars="mastodon_db_password=your-password mastodon_db_login_unix_socket='/var/run/postgresql'"
 ```
 
 - PostgreSQL installed on host `mastodob-db`, create the database and the user:
 
 ```sh
-$ ansible-playbook playbook -i <your-host-here>, -u <remote-user> --extra-vars="mastodon_db_password=your-password mastodon_db_login_host=mastodon-db mastodon_db_port=5432 mastodon_db_login_user=your-admin-db-user mastodon_db_login_password=your-password"
+$ ansible-playbook bare/playbook.yml -i <your-host-here>, -u <remote-user> --extra-vars="mastodon_db_password=your-password mastodon_db_login_host=mastodon-db mastodon_db_port=5432 mastodon_db_login_user=your-admin-db-user mastodon_db_login_password=your-password"
 ```
 
 #### redis
