@@ -7,6 +7,7 @@ This playbook contains several roles for provisioning a ready-to-go Mastodon ins
 - Python 3.x
 - Virtualenv (>= 15.0.3)
 - pip/python-pip (>= 8.x)
+- Ansible (>= 3.x)
 
 for testing purposes:
 
@@ -116,7 +117,8 @@ This role contains the following tasks:
 | mastodon_host                 | The url where your mastodon instance is reachable. E.g. `example.social`
 | disable_hsts                  | Per default the system will enable [HSTS](https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security). You can set this to `true` if you want to disable it.
 | disable_letsencrypt           | Per default the system will attempt to obtain SSL certificate via LetsEncrypt. You can set this to `true` if you want to disable it.
-| use_http                      | Per default the system will use HTTPS and redirect any HTTP traffic to HTTPS. Useful for development or reverse proxy scenarios. You can set this to `true` if you want to enable it.
+| certbot_extra_param           | Any additional parameters you want to pass to certbot during cert request. Default is blank.
+| use_http                      | Per default the system will use HTTPS and redirect any HTTP traffic to HTTPS. With recent changes to Mastodon, Puma server now enforces HTTPS, and unless you do config changes to the Mastodon configuration yourself, you will end up in a redirect loop with NGINX trying to serve content via HTTP, and Mastodon enforcing and switching to HTTPS in a loop over and over again. Don't enable this unless you REALLY know what you're doing.
 | nginx_catch_all               | Per default the system will only show Mastodon for a defined url in mastodon_host. Useful for development or reverse proxy scenarios. Recommended to use with use_http. You can set this to `true` if you want to enable it.
 | mastodon_version               | Specifies which version of Mastodon you want to download. Default is "latest"
 | mastodon_allow_prerelease               | Specifies if you want to download release candidate builds of Mastodon when "latest" is specified. Default is "false".

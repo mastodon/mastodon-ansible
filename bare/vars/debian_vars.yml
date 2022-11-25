@@ -36,6 +36,8 @@ packages:
   - package: "yarn"
   - package: "zlib1g-dev"
   - package: "libssl-dev"
+  - package: "certbot"
+  - package: "python3-certbot-nginx"
 
 postgres:
   packages:

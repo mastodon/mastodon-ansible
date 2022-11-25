@@ -36,6 +36,8 @@ packages:
   - package: "dnf-automatic"
   - package: "yarn"
   - package: "zlib-devel"
+  - package: "certbot"
+  - package: "python3-certbot-nginx"
 
 postgres:
   packages:

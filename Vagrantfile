@@ -1,4 +1,5 @@
 goss_version = '0.3.16'
+pebble_version = '2.3.1'
 install_goss = <<~SHELL
   echo "Running Goss tests:"
   echo "The target is \$TARGET" && \
@@ -19,11 +20,32 @@ sudo systemctl restart postgresql
 SHELL
 
 #Need to run this under root for it to stick and not throw permission errors
-localhost_domain = <<-'SHELL'
-echo "Set localhost to answer to mastodon.local"
-sudo su
-echo "127.0.0.1       mastodon.local" >> /etc/hosts
-exit
+#Enabling PEBBLE_VA_ALWAYS_VALID=1 as final challenge response from Pebble returns an empty body 
+#and always fails the HTTP-01 ACME challenge. Possible upstream bug?
+#Until its fixed we don't need Pebble ACME Response Server for the time being
+localhost_domain = <<~SHELL
+  echo "Set localhost to answer to mastodon.local"
+  sudo su
+  echo "127.0.0.1       mastodon.local" >> /etc/hosts
+  echo "Run preventive cleanup tasks for Pebble ACME Server"
+  rm -rf /etc/letsencrypt/accounts/localhost:14000
+  echo "Download Pebble ACME Server tarball containing tests"
+  curl -Lo /tmp/pebble-v#{pebble_version}.tar.gz https://github.com/letsencrypt/pebble/archive/refs/tags/v#{pebble_version}.tar.gz
+  tar -xvzf /tmp/pebble-v#{pebble_version}.tar.gz -C /tmp/
+  echo "Install and start Pebble ACME Server binary for testing"
+  curl -Lo /tmp/pebble-#{pebble_version}/pebble https://github.com/letsencrypt/pebble/releases/download/v#{pebble_version}/pebble_linux-amd64
+  chmod +x /tmp/pebble-#{pebble_version}/pebble
+  echo "PEBBLE_VA_ALWAYS_VALID=1 /tmp/pebble-#{pebble_version}/pebble -config ./test/config/pebble-config.json" > /tmp/pebble-#{pebble_version}/pebble.sh && chmod +x /tmp/pebble-#{pebble_version}/pebble.sh
+  cd /tmp/pebble-#{pebble_version} && nohup ./pebble.sh  &> /tmp/pebble.log&
+  sleep 2 && cat /tmp/pebble.log
+  #echo "Install and start Pebble ACME Response Server binary for testing"
+  #curl -Lo /tmp/pebble-#{pebble_version}/pebble_challtestsrv https://github.com/letsencrypt/pebble/releases/download/v#{pebble_version}/pebble-challtestsrv_linux-amd64
+  #chmod +x /tmp/pebble-#{pebble_version}/pebble_challtestsrv 
+  #cd /tmp/pebble-#{pebble_version} && nohup ./pebble_challtestsrv &> /tmp/pebble_challtestsrv.log&
+  #sleep 2 && cat /tmp/pebble_challtestsrv.log
+  #echo "Update Pebble ChallTestSrv mock DNS data"
+  #curl --request POST --data '{"ip":"172.0.0.1"}' http://localhost:8055/set-default-ipv4
+  #curl -d '{"host":"mastodon.local", "addresses":["127.0.0.1"]}' http://localhost:8055/add-a
 SHELL
 
 ansible_extra_vars = {
@@ -31,7 +53,7 @@ ansible_extra_vars = {
   mastodon_host: 'mastodon.local',
   redis_pass: 'CHANGEME',
   local_domain: 'mastodon.local',
-  disable_letsencrypt: 'true'
+  certbot_extra_param: '--server https://localhost:14000/dir --no-verify-ssl'
 }
 
 Vagrant.configure('2') do |config|
@@ -82,7 +104,6 @@ Vagrant.configure('2') do |config|
         ansible.playbook = 'bare/playbook.yml'
         ansible.extra_vars = ansible_extra_vars
         ansible.verbose = true
-        ansible.skip_tags = 'letsencrypt'
       end
 
       bare.vm.provision 'shell' do |shell|
@@ -112,7 +133,6 @@ Vagrant.configure('2') do |config|
       ansible.playbook = 'bare/playbook.yml'
       ansible.extra_vars = ansible_extra_vars
       ansible.verbose = true
-      ansible.skip_tags = 'letsencrypt'
     end
     
     #We can't have two shell.inline for some reason or the first one won't run
@@ -149,7 +169,6 @@ Vagrant.configure('2') do |config|
       ansible.playbook = 'bare/playbook.yml'
       ansible.extra_vars = ansible_extra_vars
       ansible.verbose = true
-      ansible.skip_tags = 'letsencrypt'
     end
 
     #We can't have two shell.inline for some reason or the first one won't run
