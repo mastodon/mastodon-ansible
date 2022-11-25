@@ -15,10 +15,12 @@ server {
   server_name _;
   {% endif %}
 
-  # Useful for Let's Encrypt
+  {% if disable_letsencrypt != "true" %}
+  root {{ mastodon_home }}/{{ mastodon_path }}/public;
   location /.well-known/acme-challenge/ { 
     alias {{ mastodon_home }}/{{ mastodon_path }}/public/.well-known/acme-challenge/;
   }
+  {% endif %}
 
   {% if use_http != "true" %}
     location / { return 301 https://$host$request_uri; }
@@ -113,14 +115,14 @@ server {
   ssl_prefer_server_ciphers on;
   ssl_session_cache shared:SSL:10m;
 
-{% if disable_letsencrypt != "true" %}
-  ssl_certificate     /etc/letsencrypt/live/{{ mastodon_host }}/fullchain.pem;
-  ssl_certificate_key /etc/letsencrypt/live/{{ mastodon_host }}/privkey.pem;
-{% endif %}
-
 {% if disable_letsencrypt == "true" %}
   ssl_certificate     {{ self_signed_cert_location }}/server.crt;
   ssl_certificate_key {{ self_signed_key_location }}/server.key;
+{% endif %}
+
+{% if disable_letsencrypt != "true" %}
+    ssl_certificate /etc/letsencrypt/live/{{ mastodon_host }}/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/{{ mastodon_host }}/privkey.pem; # managed by Certbot
 {% endif %}
 
   keepalive_timeout    70;

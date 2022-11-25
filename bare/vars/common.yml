@@ -14,7 +14,10 @@ mastodon_db_port: 5432
 mastodon_nginx_symlink: "/var/www/html/mastodon"
 disable_hsts: "false"
 disable_letsencrypt: "false"
+letsencrypt_email: "webmaster@{{ mastodon_host }}"
 #Use HTTP only for Vagrant testing or for reverse proxy purposes.
+#With recent changes to Mastodon, Puma server now enforces HTTPS, and unless you do config
+#changes, you will end up in a redirect loop with nginx going to HTTP and puma going to HTTPS over and over again
 use_http: "false"
 #Nginx will listen to every IP/Domain with this directive. Useful for reverse proxy or testing only.
 nginx_catch_all: "false"
@@ -23,3 +26,5 @@ redis_port: 6379
 db_host: /var/run/postgresql
 self_signed_cert_location: /etc/ssl/certs
 self_signed_key_location: /etc/ssl/private
+#If you want to append any extra parameters to let's encrypt's certbot
+certbot_extra_param: ''

@@ -18,6 +18,21 @@
   when:
     - ansible_os_family == "Debian"
     - not letsencrypt_cert.stat.exists
+#We need to start NGINX first to populate all configs and let the certbot nginx module do its job
+- name: "Start NGINX service"
+  become: yes
+  #Workaround for "Interactive authentication required" issue
+  become_user: root
+  service: "name={{ item }} state=started"
+  with_items:
+  - nginx
+  when:
+    - not letsencrypt_cert.stat.exists
+
+- name: Obtain Letsencrypt Certificate via Certbot
+#  command: certbot 'certonly -n --webroot -d {{ mastodon_host }} -w {{ mastodon_home }}/{{ mastodon_path }}/public/ --email "{{ letsencrypt_email }}" --agree-tos {{ certbot_extra_param}}'
+  command: 'certbot certonly --nginx --preferred-challenges http -n -d {{ mastodon_host }} -m "{{ letsencrypt_email }}" --agree-tos {{ certbot_extra_param }}'
+  when: not letsencrypt_cert.stat.exists
 
 - name: Copy and enable letsencrypt nginx config on RedHat systems
   template: 
@@ -30,14 +45,14 @@
 - name: Reload nginx
   command: "systemctl reload-or-restart nginx"
 
-- name: Install letsencrypt cert
-  command: letsencrypt certonly -n --webroot -d {{ mastodon_host }} -w {{ mastodon_home }}/{{ mastodon_path }}/public/ --email "webmaster@{{ mastodon_host }}" --agree-tos
-  when: not letsencrypt_cert.stat.exists
-
-- name: Letsencrypt Job
-  cron:
-    name: "letsencrypt renew"
-    minute: "15"
-    hour: "0"
-    job: "letsencrypt renew && service nginx reload"
+#No longer required
+#Message from Certbot when obtaining a cert:
+#"Certbot has set up a scheduled task to automatically renew this certificate in the background."
+#
+#- name: Schedule Certbot Renewal Job
+#  cron:
+#    name: "certbot renew"
+#    minute: "15"
+#    hour: "0"
+#    job: "certbot renew && service nginx reload"
 
