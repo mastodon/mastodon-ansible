@@ -2,6 +2,22 @@
 - stat: path=/etc/letsencrypt/live/{{ mastodon_host }}/fullchain.pem
   register: letsencrypt_cert
 
+#Certbot instructions taken from official EFF instructions
+#https://certbot.eff.org/instructions?ws=nginx&os=pip
+
+- name: Install Certbot in virtualenv
+  ansible.builtin.pip:
+    name: 
+      - certbot
+      - certbot-nginx
+    virtualenv: /opt/certbot
+
+- name: "Symlink certbot package from python venv to /usr/bin"
+  file:
+    src: "/opt/certbot/bin/certbot"
+    dest: "/usr/bin/certbot"
+    state: link
+
 #We need to start NGINX first to populate all configs and let the certbot nginx module do its job
 - name: "Start NGINX service"
   become: yes
@@ -19,14 +35,21 @@
   when: not letsencrypt_cert.stat.exists
 
 
-#No longer required
-#Message from Certbot when obtaining a cert:
-#"Certbot has set up a scheduled task to automatically renew this certificate in the background."
-#
-#- name: Schedule Certbot Renewal Job
-#  cron:
-#    name: "certbot renew"
-#    minute: "15"
-#    hour: "0"
-#    job: "certbot renew && service nginx reload"
+#When using Certbot from pip package, we need to schedule a cron or expect failures
+#Based on EFF Certbot guidance
+- name: Schedule Certbot Certificate Renewal Job
+  cron:
+    name: "certbot renew"
+    minute: "15"
+    hour: "0"
+    job: "/opt/certbot/bin/python -c 'import random; import time; time.sleep(random.random() * 3600)' && sudo certbot renew -q && service nginx reload"
+
+#Based on EFF Certbot guidance
+- name: Schedule Certbot Autoupdate Job
+  cron:
+    name: "certbot renew"
+    minute: "0"
+    hour: "0"
+    day: "1"
+    job: "/opt/certbot/bin/pip install --upgrade certbot certbot-nginx"
 
