@@ -122,6 +122,8 @@
     - ansible_os_family == "Debian"
 
 - name: Ensure that we have correct selinux context permissions for RedHat systems
+  become: yes
+  become_user: root
   community.general.sefcontext:
     target: '{{ mastodon_home }}/{{ mastodon_path }}/public(/.*)?'
     setype: httpd_sys_content_t
