@@ -174,7 +174,7 @@
   become: yes
   #Workaround for "Interactive authentication required" issue
   become_user: root
-  service: name=nginx state=restarted enabled=yes
+  service: name=nginx state=restarted
   tags:
     - systemd
 
