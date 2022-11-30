@@ -7,7 +7,7 @@
 
 - name: Ensure nginx can enter {{ mastodon_home }}
   ansible.builtin.file:
-    path: {{ mastodon_home }}
+    path: "{{ mastodon_home }}"
     mode: '0701'
   when:
     - ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
