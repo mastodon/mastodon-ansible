@@ -175,6 +175,7 @@
   #Workaround for "Interactive authentication required" issue
   become_user: root
   service: name=nginx state=restarted
+  enabled: yes
   tags:
     - systemd
 
