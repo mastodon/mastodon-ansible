@@ -178,15 +178,6 @@
   tags:
     - systemd
 
-- name: Restart nginx
-  become: yes
-  #Workaround for "Interactive authentication required" issue
-  become_user: root
-  service: name=nginx state=restarted
-  enabled: yes
-  tags:
-    - systemd
-
 - name: Check if Mastodon instance is up and running
   uri:
     url: 'https://{{ mastodon_host }}/about'
