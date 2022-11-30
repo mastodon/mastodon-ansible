@@ -32,6 +32,7 @@ packages:
   - package: "protobuf-compiler"
   - package: "sudo"
   - package: "systemd"
+  - package: "tar"
   - package: "firewalld"
   - package: "dnf-automatic"
   - package: "yarn"
