@@ -6,3 +6,5 @@
     apply:
       become: true
       become_user: postgres
+- include_tasks: bouncer.yml
+  when: use_pgbouncer | bool

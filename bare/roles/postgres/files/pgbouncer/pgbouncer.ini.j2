@@ -1,0 +1,70 @@
+;;;
+;;; PgBouncer configuration file
+;;;
+
+;; database name = connect string
+;;
+;; connect string params:
+;;   dbname= host= port= user= password= auth_user=
+;;   client_encoding= datestyle= timezone=
+;;   pool_size= reserve_pool= max_db_connections=
+;;   pool_mode= connect_query= application_name=
+
+[databases]
+
+{{ mastodon_db }} = host={{ db_host }} port={{ mastodon_db_port }} dbname={{ mastodon_db }} user={{ mastodon_db_user }} password={{ mastodon_db_password }}
+
+;; Configuration section
+[pgbouncer]
+
+;;;
+;;; Administrative settings
+;;;
+
+logfile = /var/log/postgresql/pgbouncer.log
+pidfile = /var/run/postgresql/pgbouncer.pid
+
+;;;
+;;; Where to wait for clients
+;;;
+
+;; IP address or * which means all IPs
+listen_addr = localhost
+listen_port = {{ pgbouncer_port }}
+
+;; Unix socket is also used for -R.
+;; On Debian it should be /var/run/postgresql
+;unix_socket_dir = /tmp
+;unix_socket_mode = 0777
+;unix_socket_group =
+unix_socket_dir = /var/run/postgresql
+
+;;;
+;;; Authentication settings
+;;;
+
+;; any, trust, plain, md5, cert, hba, pam
+auth_type = md5
+auth_file = /etc/pgbouncer/userlist.txt
+
+;;;
+;;; Pooler personality questions
+;;;
+
+;; When server connection is released back to pool:
+;;   session      - after client disconnects (default)
+;;   transaction  - after transaction finishes
+;;   statement    - after statement finishes
+pool_mode = transaction
+
+;;;
+;;; Connection limits
+;;;
+
+;; Total number of clients that can connect
+max_client_conn = 100
+
+;; Default pool size.  20 is good number when transaction pooling
+;; is in use, in session pooling it needs to be the number of
+;; max clients you want to handle at any moment
+default_pool_size = 20

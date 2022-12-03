@@ -23,3 +23,5 @@ redis_port: 6379
 db_host: /var/run/postgresql
 self_signed_cert_location: /etc/ssl/certs
 self_signed_key_location: /etc/ssl/private
+use_pgbouncer: "false"
+pgbouncer_port: 6432

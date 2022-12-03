@@ -126,6 +126,8 @@ This role contains the following tasks:
 
 This role installs PostgresSQL, adds a database (named `mastodon_instance` by default) and a user (named `mastodon` by default). For connecting to the database it can either use a local socket by setting the variable `mastodon_db_login_unix_socket` to the directory the Postgres socket lives in (`/var/run/postgresql` by default under Ubuntu 18.04) or a remote PostgreSQL instance you have installed somewhere else. You will than have to set the `mastodon_db_login_host` (IP address or hostname of database), `mastodon_db_port` (the port the database is accessible on; default `5432`), `mastodon_db_login_user` (the administrative user to connect to the database with) and `mastodon_db_login_password`.
 
+This role will optionally install PgBouncer and configure Mastodon to use it.
+
 ##### Settings
 
 | config setting  | explanation |
@@ -134,6 +136,7 @@ This role installs PostgresSQL, adds a database (named `mastodon_instance` by de
 | mastodon_db_user              | Database user for mastodon
 | mastodon_db_password          | Database password for mastodon
 | mastodon_db_login_unix_socket | Unix socket of the local PostgresSQL instance (not needed when using remote connection)
+| use_pgbouncer                 | Install PgBouncer and use it
 
 If you configure your PostgresSQL on another server, you need
 to configure these settings additionally:

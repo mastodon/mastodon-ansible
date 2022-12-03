@@ -17,3 +17,10 @@
     #    state: latest
     #    install_recommends: no
   with_items: "{{ postgres.packages }}"
+
+- name: Install PgBouncer
+  become: yes
+  package:
+    name: "pgbouncer"
+    update_cache: no
+  when: use_pgbouncer | bool

@@ -94,7 +94,8 @@
   when: not production_config.stat.exists
 
 - name: Migrate database
-  shell: "RAILS_ENV=production ~/.rbenv/shims/bundle exec rails db:migrate"
+  # Explicitly set DB_PORT to bypass PgBouncer if configured
+  shell: "RAILS_ENV=production DB_PORT={{ mastodon_db_port }} ~/.rbenv/shims/bundle exec rails db:migrate"
   args:
     chdir: "{{ mastodon_home }}/{{ mastodon_path }}"
   when: production_config.stat.exists
