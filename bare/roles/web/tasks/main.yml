@@ -31,7 +31,7 @@
       tags:
         - firewall
   when: 
-  - ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
+  - ansible_os_family == "RedHat"
 
 - include_tasks: mastodon-preflight.yml
   args:
