@@ -7,7 +7,7 @@
   register: is_node10_enabled
   ignore_errors: true
   when: 
-  - ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
+  - ansible_os_family == "RedHat"
   - ansible_facts['distribution_major_version'] == "8"
 
 - name: Disable NodeJS 10 module
@@ -15,7 +15,7 @@
   shell: "dnf module disable nodejs:10 -y"
   ignore_errors: true
   when: 
-  - ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
+  - ansible_os_family == "RedHat"
   - ansible_facts['distribution_major_version'] == "8"
   - is_node10_enabled.stdout | bool
 
@@ -24,7 +24,7 @@
   shell: "dnf module enable nodejs:16 -y"
   ignore_errors: true
   when: 
-  - ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
+  - ansible_os_family == "RedHat"
   - ansible_facts['distribution_major_version'] == "8"
   - is_node10_enabled.stdout | bool
 
@@ -34,7 +34,7 @@
     name: "@nodejs:16"
     state: present
   when: 
-  - ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
+  - ansible_os_family == "RedHat"
   - ansible_facts['distribution_major_version'] == "8"  
 
 #RHEL9 already installs NodeJS 16 by default
@@ -44,5 +44,5 @@
     name: "nodejs"
     state: present
   when: 
-  - ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
+  - ansible_os_family == "RedHat"
   - ansible_facts['distribution_major_version'] == "9"  

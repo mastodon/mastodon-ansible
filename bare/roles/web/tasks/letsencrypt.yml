@@ -24,7 +24,7 @@
     src: ../files/nginx/letsencrypt.conf.j2
     dest: /etc/nginx/conf.d/mastodon.conf
   when:
-    - ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
+    - ansible_os_family == "RedHat"
     - not letsencrypt_cert.stat.exists
 
 - name: Reload nginx

@@ -78,4 +78,4 @@
   become_user: root
   shell: "chcon -R --reference /bin {{ mastodon_home }}/.rbenv/shims/bundle"
   when:
-    - ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
+    - ansible_os_family == "RedHat"

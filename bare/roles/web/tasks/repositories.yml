@@ -35,14 +35,14 @@
   become: yes
   shell: dnf config-manager --set-enabled powertools
   when: 
-  - ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
+  - ansible_os_family == "RedHat"
   - ansible_facts['distribution_major_version'] == "8"
 
 - name: Enable crb repository for RHEL9
   become: yes
   shell: dnf config-manager --set-enabled crb
   when: 
-  - ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
+  - ansible_os_family == "RedHat"
   - ansible_facts['distribution_major_version'] == "9"
   
 - name: Install RPMFusion repository for RHEL
@@ -53,7 +53,7 @@
     #specify to ignore GPG checks.
     disable_gpg_check: yes
     state: present
-  when: ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
+  when: ansible_os_family == "RedHat"
 
 - name: Install Yarn repository for RHEL
   become: yes
@@ -61,11 +61,11 @@
     url: https://dl.yarnpkg.com/rpm/yarn.repo
     dest: /etc/yum.repos.d/yarn.repo
     mode: '0644'
-  when: ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
+  when: ansible_os_family == "RedHat"
 
 - name: Import the Yarn repository GPG key for RHEL
   become: yes
   rpm_key:
     state: present
     key: https://dl.yarnpkg.com/rpm/pubkey.gpg
-  when: ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
+  when: ansible_os_family == "RedHat"

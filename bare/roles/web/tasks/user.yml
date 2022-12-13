@@ -10,4 +10,4 @@
     path: "{{ mastodon_home }}"
     mode: '0701'
   when:
-    - ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
+    - ansible_os_family == "RedHat"

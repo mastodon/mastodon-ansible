@@ -24,7 +24,7 @@
     line: "user nginx;"
     state: absent
   when:
-    - ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
+    - ansible_os_family == "RedHat"
 
 - name: "Ensure that NGINX doesn't run under the user www-data"
   become: yes
@@ -58,7 +58,7 @@
     src: ../files/nginx/mastodon.conf.j2
     dest: /etc/nginx/conf.d/mastodon.conf
   when:
-    - ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
+    - ansible_os_family == "RedHat"
     - mastodon_host is defined
 
 - name: Create folder structure for Mastodon public folder
@@ -69,7 +69,7 @@
     group: "nginx"
     recurse: yes
   when:
-    - ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
+    - ansible_os_family == "RedHat"
     - mastodon_host is defined
 
 - name: Create folder structure for Mastodon public folder
@@ -93,7 +93,7 @@
     group: "nginx"
     force: yes
   when:
-    - ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
+    - ansible_os_family == "RedHat"
     - mastodon_host is defined
 
 - name: Create a symbolic link of Mastodon public folder
@@ -113,21 +113,21 @@
   become: yes
   shell: "setsebool -P httpd_read_user_content 1"
   when:
-    - ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
+    - ansible_os_family == "RedHat"
     - mastodon_host is defined
 
 - name: Permit SELinux permission to allow NGINX to make proxy connections with httpd_can_network_connect
   become: yes
   shell: "setsebool -P httpd_can_network_connect 1"
   when:
-    - ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
+    - ansible_os_family == "RedHat"
     - mastodon_host is defined
 
 - name: Permit SELinux permission to allow NGINX to make proxy connections with httpd_can_network_relay
   become: yes
   shell: "setsebool -P httpd_can_network_relay 1"
   when:
-    - ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
+    - ansible_os_family == "RedHat"
     - mastodon_host is defined
 
 #Reading and writing into users home directories as a web server or executing any binary as systemd service is
@@ -138,14 +138,14 @@
   become: yes
   shell: "setsebool -P httpd_enable_homedirs on"
   when:
-    - ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
+    - ansible_os_family == "RedHat"
     - mastodon_host is defined
 
 - name: Change SELinux properties of Mastodon symlink
   become: yes
   shell: "chcon -Rt httpd_sys_content_t {{ mastodon_nginx_symlink }}"
   when:
-    - ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
+    - ansible_os_family == "RedHat"
     - mastodon_host is defined
 
 - name: "Ensure that we have correct file permissions for /var/lib/nginx/ as we are not running NGINX under default user"
@@ -157,7 +157,7 @@
     group: "nginx"
     recurse: yes
   when:
-    - ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
+    - ansible_os_family == "RedHat"
 
 - name: "Ensure that we have correct file permissions for /var/lib/nginx/ as we are not running NGINX under default user"
   become: yes
