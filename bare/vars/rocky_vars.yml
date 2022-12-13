@@ -21,6 +21,8 @@ packages:
   - package: "ncurses-devel"
   - package: "libpq-devel"
   - package: "protobuf-devel"
+  - package: "python3-policycoreutils"
+  - package: "policycoreutils-python-utils"
   - package: "readline-devel"
   - package: "openssl-devel"
   - package: "libxml2-devel"
