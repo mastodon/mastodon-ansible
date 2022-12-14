@@ -37,6 +37,13 @@
   when:
     - ansible_os_family == "RedHat"
 
+- name: restore selinux condition on RedHat systems
+  become: yes
+  become_user: root
+  ansible.builtin.command: restorecon -irv {{ mastodon_home }}/{{ mastodon_path }}/public
+  when:
+    - ansible_os_family == "RedHat"
+
 - name: Reload nginx
   command: "systemctl reload-or-restart nginx"
 
