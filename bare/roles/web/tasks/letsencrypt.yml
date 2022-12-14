@@ -27,6 +27,16 @@
     - ansible_os_family == "RedHat"
     - not letsencrypt_cert.stat.exists
 
+- name: Ensure that we have correct selinux context permissions for RedHat systems
+  become: yes
+  become_user: root
+  community.general.sefcontext:
+    target: '{{ mastodon_home }}/{{ mastodon_path }}/public(/.*)?'
+    setype: httpd_sys_content_t
+    state: present
+  when:
+    - ansible_os_family == "RedHat"
+
 - name: Reload nginx
   command: "systemctl reload-or-restart nginx"
 

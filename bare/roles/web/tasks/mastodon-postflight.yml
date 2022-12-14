@@ -121,16 +121,6 @@
   when:
     - ansible_os_family == "Debian"
 
-- name: Ensure that we have correct selinux context permissions for RedHat systems
-  become: yes
-  become_user: root
-  community.general.sefcontext:
-    target: '{{ mastodon_home }}/{{ mastodon_path }}/public(/.*)?'
-    setype: httpd_sys_content_t
-    state: present
-  when:
-    - ansible_os_family == "RedHat"
-
 #https://github.com/nodejs/node/issues/40455
 #It's possible that this is a bug with ruby 3.0.3 and gets fixed with Mastodon 4.0.0
 - name: Precompile assets with Legacy OpenSSL provider for RHEL9
