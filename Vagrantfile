@@ -1,3 +1,5 @@
+ansible_version = File.read('requirements.txt').split.find { |item| item.start_with? 'ansible==' }.split('==')[1]
+
 goss_version = '0.3.16'
 install_goss = <<~SHELL
   echo "Running Goss tests:"
@@ -10,20 +12,20 @@ install_goss = <<~SHELL
   sudo -E goss --vars vars.yaml validate
 SHELL
 
-#Fix for https://github.com/mastodon/mastodon-ansible/pull/33#issuecomment-1126071199
-postgres_use_md5 = <<-'SHELL'
-echo "Running PostgreSQL commands required for testing"
-sudo sed -i 's/host\s\s\s\sall\s\s\s\s\s\s\s\s\s\s\s\s\sall\s\s\s\s\s\s\s\s\s\s\s\s\s127.0.0.1\/32\s\s\s\s\s\s\s\s\s\s\s\sident/host    all             all             127.0.0.1\/32                 md5/g' /var/lib/pgsql/data/pg_hba.conf
-sudo sed -i 's/host\s\s\s\sall\s\s\s\s\s\s\s\s\s\s\s\s\sall\s\s\s\s\s\s\s\s\s\s\s\s\s::1\/128\s\s\s\s\s\s\s\s\s\s\s\s\s\s\s\s\sident/host    all             all             ::1\/128                 md5/g' /var/lib/pgsql/data/pg_hba.conf
-sudo systemctl restart postgresql
+# Fix for https://github.com/mastodon/mastodon-ansible/pull/33#issuecomment-1126071199
+postgres_use_md5 = <<~'SHELL'
+  echo "Running PostgreSQL commands required for testing"
+  sudo sed -i 's/host\s\s\s\sall\s\s\s\s\s\s\s\s\s\s\s\s\sall\s\s\s\s\s\s\s\s\s\s\s\s\s127.0.0.1\/32\s\s\s\s\s\s\s\s\s\s\s\sident/host    all             all             127.0.0.1\/32                 md5/g' /var/lib/pgsql/data/pg_hba.conf
+  sudo sed -i 's/host\s\s\s\sall\s\s\s\s\s\s\s\s\s\s\s\s\sall\s\s\s\s\s\s\s\s\s\s\s\s\s::1\/128\s\s\s\s\s\s\s\s\s\s\s\s\s\s\s\s\sident/host    all             all             ::1\/128                 md5/g' /var/lib/pgsql/data/pg_hba.conf
+  sudo systemctl restart postgresql
 SHELL
 
-#Need to run this under root for it to stick and not throw permission errors
-localhost_domain = <<-'SHELL'
-echo "Set localhost to answer to mastodon.local"
-sudo su
-echo "127.0.0.1       mastodon.local" >> /etc/hosts
-exit
+# Need to run this under root for it to stick and not throw permission errors
+localhost_domain = <<~'SHELL'
+  echo "Set localhost to answer to mastodon.local"
+  sudo su
+  echo "127.0.0.1       mastodon.local" >> /etc/hosts
+  exit
 SHELL
 
 ansible_extra_vars = {
@@ -67,18 +69,20 @@ Vagrant.configure('2') do |config|
   ].each do |d|
     config.vm.define d[:name], primary: d[:primary], autostart: d[:autostart] do |bare|
       bare.vm.box = "ubuntu/#{d[:name]}64"
-      #MacOS Ventura workaround
-      #bare.vm.network :private_network, type: 'dhcp', name: "HostOnly", virtualbox__intnet: true
+      # MacOS Ventura workaround
+      # bare.vm.network :private_network, type: 'dhcp', name: "HostOnly", virtualbox__intnet: true
       bare.vm.network 'private_network', type: 'dhcp'
 
-      #Needs to be ran before running the playbook or Ansible checks will fail
-      #as we are checking against non-valid FQDN
+      # Needs to be ran before running the playbook or Ansible checks will fail
+      # as we are checking against non-valid FQDN
       bare.vm.provision 'shell' do |shell|
         shell.privileged = true
         shell.inline = localhost_domain
       end
 
       bare.vm.provision 'ansible_local' do |ansible|
+        ansible.version = ansible_version
+        ansible.install_mode = 'pip'
         ansible.playbook = 'bare/playbook.yml'
         ansible.extra_vars = ansible_extra_vars
         ansible.verbose = true
@@ -97,28 +101,30 @@ Vagrant.configure('2') do |config|
 
   config.vm.define 'rhel8', autostart: false do |bare|
     bare.vm.box = 'geerlingguy/rockylinux8'
-      #MacOS Ventura workaround
-      #bare.vm.network :private_network, type: 'dhcp', name: "HostOnly", virtualbox__intnet: true
-      bare.vm.network 'private_network', type: 'dhcp'
+    # MacOS Ventura workaround
+    # bare.vm.network :private_network, type: 'dhcp', name: "HostOnly", virtualbox__intnet: true
+    bare.vm.network 'private_network', type: 'dhcp'
 
-    #Needs to be ran before running the playbook or Ansible checks will fail
-    #as we are checking against non-valid FQDN
+    # Needs to be ran before running the playbook or Ansible checks will fail
+    # as we are checking against non-valid FQDN
     bare.vm.provision 'shell' do |shell|
       shell.privileged = true
       shell.inline = localhost_domain
     end
 
     bare.vm.provision 'ansible_local' do |ansible|
+      ansible.version = ansible_version
+      ansible.install_mode = 'pip'
       ansible.playbook = 'bare/playbook.yml'
       ansible.extra_vars = ansible_extra_vars
       ansible.verbose = true
       ansible.skip_tags = 'letsencrypt'
     end
-    
-    #We can't have two shell.inline for some reason or the first one won't run
+
+    # We can't have two shell.inline for some reason or the first one won't run
     bare.vm.provision 'shell' do |shell|
       shell.privileged = true
-      shell.inline = postgres_use_md5 
+      shell.inline = postgres_use_md5
     end
 
     bare.vm.provision 'shell' do |shell|
@@ -133,29 +139,31 @@ Vagrant.configure('2') do |config|
   config.vm.define 'rhel9', autostart: false do |bare|
     bare.vm.box = 'generic/rocky9'
     bare.vm.network 'private_network', type: 'dhcp'
-    #Not specifying this results in
-    #this error to be displayed "`playbook` does not exist on the guest: /vagrant/bare/playbook.yml error"
-    #The generic image might be a just a little bit broken, but rockylinux/9 is not ready yet
-    bare.vm.synced_folder ".", "/vagrant"
+    # Not specifying this results in
+    # this error to be displayed "`playbook` does not exist on the guest: /vagrant/bare/playbook.yml error"
+    # The generic image might be a just a little bit broken, but rockylinux/9 is not ready yet
+    bare.vm.synced_folder '.', '/vagrant'
 
-    #Needs to be ran before running the playbook or Ansible checks will fail
-    #as we are checking against non-valid FQDN
+    # Needs to be ran before running the playbook or Ansible checks will fail
+    # as we are checking against non-valid FQDN
     bare.vm.provision 'shell' do |shell|
       shell.privileged = true
       shell.inline = localhost_domain
     end
 
     bare.vm.provision 'ansible_local' do |ansible|
+      ansible.version = ansible_version
+      ansible.install_mode = 'pip'
       ansible.playbook = 'bare/playbook.yml'
       ansible.extra_vars = ansible_extra_vars
       ansible.verbose = true
       ansible.skip_tags = 'letsencrypt'
     end
 
-    #We can't have two shell.inline for some reason or the first one won't run
+    # We can't have two shell.inline for some reason or the first one won't run
     bare.vm.provision 'shell' do |shell|
       shell.privileged = true
-      shell.inline = postgres_use_md5 
+      shell.inline = postgres_use_md5
     end
 
     bare.vm.provision 'shell' do |shell|
