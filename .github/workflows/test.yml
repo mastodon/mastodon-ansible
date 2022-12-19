@@ -32,10 +32,10 @@ jobs:
           key: ${{ runner.os }}-vagrant-${{ hashFiles('Vagrantfile') }}
           restore-keys: |
             ${{ runner.os }}-vagrant-
-      - name: Install Python 3.8
+      - name: Install Python 3.9
         uses: actions/setup-python@v4
         with:
-          python-version: 3.8
+          cache: pip
       - name: Run tests in Vagrant
         run: |
           pip install --upgrade pip
