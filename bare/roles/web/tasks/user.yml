@@ -5,9 +5,17 @@
     shell: /bin/bash
     home: "{{ mastodon_home }}"
 
-- name: Ensure nginx can enter {{ mastodon_home }}
+- name: Adding user nginx to mastodon user
+  user:
+    name: 'nginx'
+    groups: mastodon
+    append: yes
+  when:
+    - ansible_os_family == "RedHat"
+
+- name: Allow mastodon groupusers to enter {{ mastodon_home }}
   ansible.builtin.file:
     path: "{{ mastodon_home }}"
-    mode: '0701'
+    mode: '0710'
   when:
     - ansible_os_family == "RedHat"
