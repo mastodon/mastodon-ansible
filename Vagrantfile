@@ -1,9 +1,11 @@
-goss_version = '0.3.16'
+ansible_version = File.read('requirements.txt').split.find { |item| item.start_with? 'ansible==' }.split('==')[1]
+
+goss_version = '0.3.21'
 install_goss = <<~SHELL
   echo "Running Goss tests:"
   echo "The target is \$TARGET" && \
   curl -Lo /tmp/goss https://github.com/aelsabbahy/goss/releases/download/v#{goss_version}/goss-linux-amd64 && \
-  echo "827e354b48f93bce933f5efcd1f00dc82569c42a179cf2d384b040d8a80bfbfb  /tmp/goss" | sha256sum -c --strict - && \
+  echo "9a9200779603acf0353d2c0e85ae46e083596c10838eaf4ee050c924678e4fe3  /tmp/goss" | sha256sum -c --strict - && \
   sudo install -m0755 -o root -g root /tmp/goss /usr/bin/goss && \
   rm /tmp/goss
   cd /vagrant
@@ -114,11 +116,11 @@ Vagrant.configure('2') do |config|
       ansible.verbose = true
       ansible.skip_tags = 'letsencrypt'
     end
-    
+
     #We can't have two shell.inline for some reason or the first one won't run
     bare.vm.provision 'shell' do |shell|
       shell.privileged = true
-      shell.inline = postgres_use_md5 
+      shell.inline = postgres_use_md5
     end
 
     bare.vm.provision 'shell' do |shell|
@@ -155,7 +157,7 @@ Vagrant.configure('2') do |config|
     #We can't have two shell.inline for some reason or the first one won't run
     bare.vm.provision 'shell' do |shell|
       shell.privileged = true
-      shell.inline = postgres_use_md5 
+      shell.inline = postgres_use_md5
     end
 
     bare.vm.provision 'shell' do |shell|
