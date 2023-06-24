@@ -81,10 +81,9 @@ Vagrant.configure('2') do |config|
         shell.inline = localhost_domain
       end
 
-      bare.vm.provision 'ansible_local' do |ansible|
+      bare.vm.provision 'ansible' do |ansible|
         ansible.playbook = 'bare/playbook.yml'
         ansible.extra_vars = ansible_extra_vars
-        ansible.install_mode = 'pip'
         ansible.version = ansible_version
         ansible.verbose = true
         ansible.skip_tags = 'letsencrypt'
@@ -113,10 +112,9 @@ Vagrant.configure('2') do |config|
       shell.inline = localhost_domain
     end
 
-    bare.vm.provision 'ansible_local' do |ansible|
+    bare.vm.provision 'ansible' do |ansible|
       ansible.playbook = 'bare/playbook.yml'
       ansible.version = ansible_version
-      ansible.install_mode = 'pip'
       ansible.extra_vars = ansible_extra_vars
       ansible.verbose = true
       ansible.skip_tags = 'letsencrypt'
@@ -152,10 +150,9 @@ Vagrant.configure('2') do |config|
       shell.inline = localhost_domain
     end
 
-    bare.vm.provision 'ansible_local' do |ansible|
+    bare.vm.provision 'ansible' do |ansible|
       ansible.playbook = 'bare/playbook.yml'
       ansible.version = ansible_version
-      ansible.install_mode = 'pip'
       ansible.extra_vars = ansible_extra_vars
       ansible.verbose = true
       ansible.skip_tags = 'letsencrypt'

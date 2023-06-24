@@ -8,7 +8,6 @@ file:
     owner: "mastodon"
     group: "mastodon"
     filetype: "file"
-    mode: "0664"
     contains: ["rbenv init -", "PATH="]
   /usr/bin/node:
     exists: true
