@@ -36,6 +36,7 @@ ansible_extra_vars = {
   disable_letsencrypt: 'true'
 }
 
+Vagrant.require_version ">= 2.3.5"
 Vagrant.configure('2') do |config|
   # RAM has to be bumped up due of precompile assets silently failing with just 1GB of RAM
   # https://github.com/rails/webpacker/issues/955
@@ -83,6 +84,8 @@ Vagrant.configure('2') do |config|
       bare.vm.provision 'ansible_local' do |ansible|
         ansible.playbook = 'bare/playbook.yml'
         ansible.extra_vars = ansible_extra_vars
+        ansible.install_mode = 'pip'
+        ansible.version = ansible_version
         ansible.verbose = true
         ansible.skip_tags = 'letsencrypt'
       end
@@ -112,6 +115,8 @@ Vagrant.configure('2') do |config|
 
     bare.vm.provision 'ansible_local' do |ansible|
       ansible.playbook = 'bare/playbook.yml'
+      ansible.version = ansible_version
+      ansible.install_mode = 'pip'
       ansible.extra_vars = ansible_extra_vars
       ansible.verbose = true
       ansible.skip_tags = 'letsencrypt'
@@ -149,6 +154,8 @@ Vagrant.configure('2') do |config|
 
     bare.vm.provision 'ansible_local' do |ansible|
       ansible.playbook = 'bare/playbook.yml'
+      ansible.version = ansible_version
+      ansible.install_mode = 'pip'
       ansible.extra_vars = ansible_extra_vars
       ansible.verbose = true
       ansible.skip_tags = 'letsencrypt'
