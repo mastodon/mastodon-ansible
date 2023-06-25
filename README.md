@@ -10,7 +10,7 @@ This playbook contains several roles for provisioning a ready-to-go Mastodon ins
 
 for testing purposes:
 
-- Vagrant >= 2.2.19
+- Vagrant >= 2.3.5
 
 ## Setup
 
