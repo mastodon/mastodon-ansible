@@ -46,7 +46,7 @@ $ ansible-playbook bare/playbook.yml --ask-vault-pass -i <your-host-here>, -u <r
 If you prefer not to use Ansible Vault, you can run the playbook as following:
 
 ```sh
-$ ansible-playbook bare/playbook.yml -i <your-host-here>, -u <remote-user> --ask-become-pass -e 'ansible_python_interpreter=/usr/bin/python3' --extra-vars="mastodon_db_password=your-password redis_pass=your-password mastodon_host=example.com"
+$ ansible-playbook bare/playbook.yml -i <your-host-here>, -u <remote-user> --ask-become-pass -e 'ansible_python_interpreter=/usr/bin/python3' --extra-vars="mastodon_db_password=your-password redis_pass=your-password local_domain=mastodon.local mastodon_host=example.com"
 ```
 
 The playbook is using `become` for some of its tasks, hence the user you connect to the instance with will have to have access to sudo. It should ask you for the password in due time.
