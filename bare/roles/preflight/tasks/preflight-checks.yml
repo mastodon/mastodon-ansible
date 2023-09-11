@@ -2,6 +2,17 @@
 #This creates a mess with duplicate tasks that do different things, but its required
 #Help wanted to clean up the preflight task
 
+- name: Check if email address for Certbot exists
+  fail:
+   msg: 
+   - "ERROR: An email address for Letsencrypt has not been defined! Obtaining a valid certificate will fail!"
+   - "Halting playbook and bailing out to prevent a destructive operation."
+   - "If you think this is a mistake or you know what you're doing, set the run_preflight_checks variable to false"
+  when:
+  - not disable_letsencrypt | bool
+  - not letsencrypt_email
+
+
 - name: Check if a Mastodon installation already exists
   stat:
     path: "{{ mastodon_home }}/{{mastodon_path}}"
