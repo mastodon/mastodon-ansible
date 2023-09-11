@@ -135,8 +135,8 @@
   
 - name: Symlink enabled site on Debian systems
   file:
-    src: "/etc/nginx/sites-available/mastodon.conf"
-    dest: "/etc/nginx/sites-enabled/mastodon.conf"
+    src: "/opt/certbot/bin/certbot"
+    dest: "/usr/bin/certbot"
     state: link
   when:
     - ansible_os_family == "Debian"
@@ -165,7 +165,7 @@
 
 - name: Schedule Certbot Certificate Renewal Job (Legacy)
   cron:
-    name: "letsencrypt renew"
+    name: "certbot renew"
     minute: "15"
     hour: "0"
     job: "letsencrypt renew && service nginx reload"    
