@@ -38,15 +38,7 @@ localhost_domain = <<~SHELL
   chmod +x /tmp/pebble-#{pebble_version}/pebble
   echo "PEBBLE_VA_ALWAYS_VALID=1 /tmp/pebble-#{pebble_version}/pebble -config ./test/config/pebble-config.json" > /tmp/pebble-#{pebble_version}/pebble.sh && chmod +x /tmp/pebble-#{pebble_version}/pebble.sh
   cd /tmp/pebble-#{pebble_version} && nohup ./pebble.sh  &> /tmp/pebble.log&
-  sleep 2 && cat /tmp/pebble.log
-  #echo "Install and start Pebble ACME Response Server binary for testing"
-  #curl -Lo /tmp/pebble-#{pebble_version}/pebble_challtestsrv https://github.com/letsencrypt/pebble/releases/download/v#{pebble_version}/pebble-challtestsrv_linux-amd64
-  #chmod +x /tmp/pebble-#{pebble_version}/pebble_challtestsrv 
-  #cd /tmp/pebble-#{pebble_version} && nohup ./pebble_challtestsrv &> /tmp/pebble_challtestsrv.log&
-  #sleep 2 && cat /tmp/pebble_challtestsrv.log
-  #echo "Update Pebble ChallTestSrv mock DNS data"
-  #curl --request POST --data '{"ip":"172.0.0.1"}' http://localhost:8055/set-default-ipv4
-  #curl -d '{"host":"mastodon.local", "addresses":["127.0.0.1"]}' http://localhost:8055/add-a
+  #sleep 2 && cat /tmp/pebble.log #Debug Option, use for when debugging ACME auth issues
 SHELL
 
 ansible_extra_vars = {
@@ -54,7 +46,9 @@ ansible_extra_vars = {
   mastodon_host: 'mastodon.local',
   redis_pass: 'CHANGEME',
   local_domain: 'mastodon.local',
-  certbot_extra_param: '--server https://localhost:14000/dir --no-verify-ssl'
+  certbot_extra_param: '--server https://localhost:14000/dir --no-verify-ssl',
+  use_legacy_certbot: 'false',
+  letsencrypt_email: 'webmaster@mastodon.local'
 }
 
 Vagrant.require_version ">= 2.3.5"
@@ -120,6 +114,8 @@ Vagrant.configure('2') do |config|
   end
 
   config.vm.define 'rhel8', autostart: false do |bare|
+    #For VMWare Provider, you can use generic/rocky8
+    #bare.vm.box = 'generic/rocky8'
     bare.vm.box = 'geerlingguy/rockylinux8'
       #MacOS Ventura workaround
       #bare.vm.network :private_network, type: 'dhcp', name: "HostOnly", virtualbox__intnet: true
