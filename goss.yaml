@@ -63,13 +63,14 @@ service:
 
 command:
   ruby:
-  #Future proofing for 4.x that uses ruby 3.0.4
-  #Apparently this is how you're supposed to use regex with goss
-  #https://github.com/aelsabbahy/goss/blob/master/docs/manual.md#patterns
+  #Previous implementation was directly checking against a fixed version and required manual update every time mastodon updated it's ruby version
+  #With this current implementation, we directly check against the ruby version requested by Mastodon against what eventually got installed
+  #Also can't use True or False as stdout output because Ubuntu is doing something funny and turning the string into a boolean and it fails the test. No I don't know why.
     exit-status: 0
-    exec: "sudo -u mastodon -i ruby -v"
+    exec: >-
+        [[ "$(sudo -u mastodon -i cat /home/mastodon/live/.ruby-version)" == "$(sudo -u mastodon -i ruby -v | sed 's/^.*[^0-9]\([0-9]*\.[0-9]*\.[0-9]*\).*$/\1/')" ]] && echo "Match" || echo "No Match"
     stdout:
-      - "/3.0.[3-6]/"
+      - "Match" 
   crontab:
     exit-status: 0
     exec: "sudo crontab -l -u mastodon"
