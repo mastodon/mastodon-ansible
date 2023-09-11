@@ -108,6 +108,7 @@ This role contains the following tasks:
 - `nodejs.yml`: **Enables NodeJS 16 DNF module for RHEL 8 systems** to ensure that we have correct NodeJS version installed.
 - `redis.yml`: **Secures Redis installation with a password** as you shouldn't run redis with no password protection.
 - `selfsigned-ssl.yml`: **Generates self-signed SSL certificates when LetsEncrypt not used** as Mastodon requires SSL to function.
+- `letsencrypt.yml`: **Automatically requests and renews a Let's Encrypt SSL certificate** for your Mastodon server. Please refer to the settings section for more information.
 
 ##### Settings
 
@@ -116,6 +117,9 @@ This role contains the following tasks:
 | mastodon_host                 | The url where your mastodon instance is reachable. E.g. `example.social`
 | disable_hsts                  | Per default the system will enable [HSTS](https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security). You can set this to `true` if you want to disable it.
 | disable_letsencrypt           | Per default the system will attempt to obtain SSL certificate via LetsEncrypt. You can set this to `true` if you want to disable it.
+| letsencrypt_email             | Email to use during certificate registration with Let's Encrypt. This is mandatory.
+| use_legacy_certbot            | If you wish to use the new way of obtaining a Let's Encrypt certificate. Heavily recommended to disable legacy certbot for new deployments. Default is true for compatibility reason with previous versions of the playbook. Uses Python, venv and pip to fetch the latest versions. Please note that deploying the new version of certbot may cause issues and will conflict with each other if you do not remove the old version manually!
+| autoupdate_certbot            | Requires `use_legacy_certbot` to be `false`! Schedule automatic updates of certbot per EFF recommendation. Default is false.
 | certbot_extra_param           | Any additional parameters you want to pass to certbot during cert request. Default is blank.
 | use_http                      | Per default the system will use HTTPS and redirect any HTTP traffic to HTTPS. With recent changes to Mastodon, Puma server now enforces HTTPS, and unless you do config changes to the Mastodon configuration yourself, you will end up in a redirect loop with NGINX trying to serve content via HTTP, and Mastodon enforcing and switching to HTTPS in a loop over and over again. Don't enable this unless you REALLY know what you're doing.
 | nginx_catch_all               | Per default the system will only show Mastodon for a defined url in mastodon_host. Useful for development or reverse proxy scenarios. Recommended to use with use_http. You can set this to `true` if you want to enable it.
@@ -190,6 +194,7 @@ $ vagrant up
 ```
 
 This should provision a new instance within VirtualBox and run all the tests necessary to verify the Ansible playbook is valid. By default it runs the bare provisioning.
+
 
 # TODO
 
