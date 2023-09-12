@@ -24,7 +24,7 @@ jobs:
       matrix:
         os: [focal, jammy, rhel8, rhel9]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Cache Vagrant boxes
         uses: actions/cache@v3
         with:
