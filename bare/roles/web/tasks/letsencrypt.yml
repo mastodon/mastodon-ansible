@@ -135,8 +135,8 @@
   
 - name: Symlink enabled site on Debian systems
   file:
-    src: "/opt/certbot/bin/certbot"
-    dest: "/usr/bin/certbot"
+    src: "/etc/nginx/sites-available/mastodon.conf"
+    dest: "/etc/nginx/sites-enabled/mastodon.conf"
     state: link
   when:
     - ansible_os_family == "Debian"
