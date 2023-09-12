@@ -36,6 +36,7 @@ packages:
   - package: "yarn"
   - package: "zlib1g-dev"
   - package: "libssl-dev"
+  - package: "python3-virtualenv"
 
 postgres:
   packages:

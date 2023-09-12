@@ -2,6 +2,128 @@
 - stat: path=/etc/letsencrypt/live/{{ mastodon_host }}/fullchain.pem
   register: letsencrypt_cert
 
+#Rocky 8 comes with Python 3.6 out of the box. This version is EoL and not supported by certbot! 
+#Installing certbot with version 3.6 will cause it to still install, but with a non-zero exit code and thus causes the playbook to fail 
+- name: Install Python 3.9 for RHEL8
+  become: yes
+  package:
+    name: 
+    - "python39"
+    - "python39-pip"
+    state: present
+  when: 
+  - use_legacy_certbot | bool == false
+  - ansible_os_family == "RedHat"
+  - ansible_facts['distribution_major_version'] == "8"
+
+- name: Install Python 3.9 PIP for RHEL9
+  become: yes
+  package:
+    name: 
+    - "python3-pip"
+    state: present
+  when: 
+  - use_legacy_certbot | bool == false
+  - ansible_os_family == "RedHat"
+  - ansible_facts['distribution_major_version'] == "9"  
+
+- name: Install Python 3 VirtualEnv for Debian Family
+  become: yes
+  package:
+    name: 
+    - "python3-venv"
+    state: present
+  when: 
+  - use_legacy_certbot | bool == false
+  - ansible_os_family == "Debian"
+
+#Per Ansible Documentation, we can't mix virtualenv_command and virtualenv_python commands, so this is required
+#https://docs.ansible.com/ansible/latest/collections/ansible/builtin/pip_module.html#parameter-virtualenv_python
+- name: Install Python 3.9 to Alternatives and select it
+  community.general.alternatives:
+    name: python3
+    path: /usr/bin/python3.9
+    link: /usr/bin/python3
+    state: selected
+  when: 
+  - use_legacy_certbot | bool == false
+  - ansible_os_family == "RedHat"
+  - ansible_facts['distribution_major_version'] == "8"
+
+#Ubuntu no likey venv via pip, it errors out and demands python3-venv dpkg package, so RHEL only
+- name: Install Virtualenv pip module
+  ansible.builtin.pip:
+    name: 
+      - virtualenv
+  when:
+    - use_legacy_certbot | bool == false
+    - ansible_os_family == "RedHat"
+
+#Certbot instructions taken from official EFF instructions
+#https://certbot.eff.org/instructions?ws=nginx&os=pip
+- name: Install Certbot in virtualenv
+  ansible.builtin.pip:
+    name: 
+      - certbot
+      - certbot-nginx
+    virtualenv: /opt/certbot
+    virtualenv_command: "python3 -m venv" #Only Python 3.6 has virtualenv binary on Rocky, non-hacky way of doing this on 3.6<
+  when:
+    - use_legacy_certbot | bool == false
+
+- name: "Symlink certbot package from python venv to /usr/bin"
+  file:
+    src: "/opt/certbot/bin/certbot"
+    dest: "/usr/bin/certbot"
+    state: link
+  when:
+    - use_legacy_certbot | bool == false
+
+#We need to start NGINX first to populate all configs and let the certbot nginx module do its job
+- name: "Start NGINX service"
+  become: yes
+  #Workaround for "Interactive authentication required" issue
+  become_user: root
+  service: "name={{ item }} state=started"
+  with_items:
+  - nginx
+  when:
+    - not letsencrypt_cert.stat.exists
+    - use_legacy_certbot | bool == false
+
+- name: Obtain Letsencrypt Certificate via Certbot
+  command: 'certbot certonly --nginx --preferred-challenges http -n -d {{ mastodon_host }} -m "{{ letsencrypt_email }}" --agree-tos {{ certbot_extra_param }}'
+  when: 
+    - not letsencrypt_cert.stat.exists
+    - use_legacy_certbot | bool == false
+
+#When using Certbot from pip package, we need to schedule a cron or expect failures
+#Based on EFF Certbot guidance
+- name: Schedule Certbot Certificate Renewal Job
+  cron:
+    name: "certbot renew"
+    minute: "15"
+    hour: "0"
+    job: "/opt/certbot/bin/python -c 'import random; import time; time.sleep(random.random() * 3600)' && sudo certbot renew -q && service nginx reload"
+  when:
+    - use_legacy_certbot | bool == false
+
+#Based on EFF Certbot guidance
+#Put behind feature flag per guidance https://github.com/mastodon/mastodon-ansible/pull/46#discussion_r1064444039
+- name: Schedule Certbot Autoupdate Job
+  cron:
+    name: "certbot renew"
+    minute: "0"
+    hour: "0"
+    day: "1"
+    job: "/opt/certbot/bin/pip install --upgrade certbot certbot-nginx"
+  when:
+    - use_legacy_certbot | bool == false
+    - autoupdate_certbot | bool 
+
+### LEGACY FOR COMPATIBILITY WITH SYSTEMS DEPLOYED WITH OLDER VERSIONS OF PLAYBOOK
+### Do not touch basically.
+
 - name: Copy letsencrypt nginx config on Debian systems
   template: 
     src: ../files/nginx/letsencrypt.conf.j2
@@ -9,6 +131,7 @@
   when:
     - ansible_os_family == "Debian"
     - not letsencrypt_cert.stat.exists
+    - use_legacy_certbot | bool
   
 - name: Symlink enabled site on Debian systems
   file:
@@ -18,6 +141,7 @@
   when:
     - ansible_os_family == "Debian"
     - not letsencrypt_cert.stat.exists
+    - use_legacy_certbot | bool
 
 - name: Copy and enable letsencrypt nginx config on RedHat systems
   template: 
@@ -26,18 +150,24 @@
   when:
     - ansible_os_family == "RedHat"
     - not letsencrypt_cert.stat.exists
+    - use_legacy_certbot | bool
 
 - name: Reload nginx
   command: "systemctl reload-or-restart nginx"
+  when:
+    - use_legacy_certbot | bool
 
 - name: Install letsencrypt cert
   command: letsencrypt certonly -n --webroot -d {{ mastodon_host }} -w {{ mastodon_home }}/{{ mastodon_path }}/public/ --email "webmaster@{{ mastodon_host }}" --agree-tos
-  when: not letsencrypt_cert.stat.exists
+  when:
+    - not letsencrypt_cert.stat.exists
+    - use_legacy_certbot | bool
 
-- name: Letsencrypt Job
+- name: Schedule Certbot Certificate Renewal Job (Legacy)
   cron:
-    name: "letsencrypt renew"
+    name: "certbot renew"
     minute: "15"
     hour: "0"
-    job: "letsencrypt renew && service nginx reload"
-
+    job: "letsencrypt renew && service nginx reload"    
+  when:
+    - use_legacy_certbot | bool
