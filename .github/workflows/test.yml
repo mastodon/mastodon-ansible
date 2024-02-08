@@ -18,13 +18,18 @@ on:
 
 jobs:
   test:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         os: [focal, jammy, rhel8, rhel9]
     steps:
       - uses: actions/checkout@v4
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
       - name: Cache Vagrant boxes
         uses: actions/cache@v3
         with:
@@ -38,6 +43,8 @@ jobs:
           cache: pip
       - name: Run tests in Vagrant
         run: |
+          apt-get update -qq
+          apt-get install -y virtualbox
           pip install --upgrade pip
           python -m venv env
           source env/bin/activate
