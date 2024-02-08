@@ -44,11 +44,13 @@ jobs:
       - name: Install virtualbox
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y virtualbox
-      - uses: nahsi/setup-hashi-tool@v1
-        with:
-          name: vagrant
-        name: Install vagrant
+          sudo apt-get install -y virtualbox gpg lsb-release
+      - name: Install vagrant
+        run: |
+          curl -L https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+          sudo apt update -qq
+          sudo apt install vagrant
       - name: Run tests in Vagrant
         run: |
           pip install --upgrade pip
