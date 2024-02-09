@@ -89,6 +89,9 @@ command:
   postgres:
     exit-status: 0
     exec: "PGPASSWORD=CHANGEME psql -d mastodon_instance -h 127.0.0.1 -U mastodon -c 'CREATE TABLE test (v varchar(20)); DROP TABLE test;'"
+  jemalloc:
+    exit-status: 0
+    exec: "sudo -u mastodon -i bash -c 'ldd $(rbenv which ruby) | grep -q libjemalloc'"
 
 http:
   https://mastodon.local/:

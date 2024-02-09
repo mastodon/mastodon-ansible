@@ -17,6 +17,7 @@ packages:
   - package: "libgdbm-dev"
   - package: "libicu-dev"
   - package: "libidn11-dev"
+  - package: "libjemalloc-dev"
   - package: "libncurses5-dev"
   - package: "libpq-dev"
   - package: "libprotobuf-dev"

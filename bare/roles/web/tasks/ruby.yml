@@ -1,5 +1,4 @@
 ---
-
 - name: Fetch Ruby version required by Mastodon
   shell: "cat {{ mastodon_home }}/{{ mastodon_path }}/.ruby-version"
   register: ruby_version
@@ -49,7 +48,7 @@
 - name: Check if the Ruby version is already installed
   shell: "~/.rbenv/bin/rbenv versions | grep -q {{ ruby_version.stdout }}"
   register: ruby_installed
-  ignore_errors: yes
+  ignore_errors: true
   check_mode: no
 
 - name: Install Ruby {{ ruby_version.stdout }}
@@ -73,7 +72,7 @@
   when: default_ruby_version is succeeded
 
 - name: Set SELinux policy for rbenv bundle same as /bin
-  become: yes
+  become: true
   #Workaround for "SELinux policy is not managed or store cannot be accessed" issue
   become_user: root
   shell: "chcon -R --reference /bin {{ mastodon_home }}/.rbenv/shims/bundle"
