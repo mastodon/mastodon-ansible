@@ -19,30 +19,44 @@
   - ansible_facts['distribution_major_version'] == "8"
   - is_node10_enabled.stdout | bool
 
-- name: Enable NodeJS 16 module
+- name: Enable NodeJS 20 module
   become: yes
-  shell: "dnf module enable nodejs:16 -y"
+  shell: "dnf module enable nodejs:20 -y"
   ignore_errors: true
   when: 
   - ansible_os_family == "RedHat"
   - ansible_facts['distribution_major_version'] == "8"
   - is_node10_enabled.stdout | bool
 
-- name: Install NodeJS 16 via DNF
+- name: Install NodeJS 20 via DNF
   become: yes
   dnf:
-    name: "@nodejs:16"
+    name: "@nodejs:20"
     state: present
   when: 
   - ansible_os_family == "RedHat"
   - ansible_facts['distribution_major_version'] == "8"  
 
-#RHEL9 already installs NodeJS 16 by default
+# RHEL9 installs NodeJS 16 by default, higher needed for corepack
 - name: Install NodeJS via DNF
   become: yes
   dnf:
-    name: "nodejs"
+    name: "@nodejs:20"
     state: present
   when: 
   - ansible_os_family == "RedHat"
   - ansible_facts['distribution_major_version'] == "9"  
+# RHEL Distros do not bundle Corepack with NodeJS as it's Opt-in only
+# https://yarnpkg.com/corepack#installation
+- name: Install Corepack via NPM
+  become: yes
+  npm:
+    name: corepack
+    global: true
+  when: 
+  - ansible_os_family == "RedHat"
+
+
+
+- name: Enable NodeJS Corepack for Yarn
+  shell: "corepack enable"

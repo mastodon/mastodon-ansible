@@ -8,10 +8,15 @@
   args:
     chdir: "{{ mastodon_home }}/{{ mastodon_path }}"
 
-- name: Yarn install
-  command: yarn install --pure-lockfile
+# yarn's "--pure-lockfile" has been deprecated and now throws errors
+# https://github.com/nodejs/node/issues/52732#issuecomment-2114851722
+# https://github.com/nodejs/snap/issues/26#issuecomment-1459032870
+- name: Yarn install via Corepack
+  command: corepack yarn install 
   args:
     chdir: "{{ mastodon_home }}/{{ mastodon_path }}"
+  environment:
+    PATH: "/usr/local/bin/corepack:{{ lookup('env', 'PATH') }}"
 
 - name: Install systemd sidekiq Service Files
   template:
@@ -44,24 +49,47 @@
 - stat: path={{ mastodon_home }}/{{ mastodon_path }}/.env.production
   register: production_config
 
+# Rake has been replaced with rails
+# https://github.com/mastodon/mastodon/pull/30917
 - name: Generate SECRET_KEY_BASE secret
-  shell: "RAILS_ENV=production ~/.rbenv/shims/bundle exec rake secret"
+  shell: "RAILS_ENV=production ~/.rbenv/shims/bundle exec rails secret"
   args:
     chdir: "{{ mastodon_home }}/{{ mastodon_path }}"
   register: secret_key_base
   when: not production_config.stat.exists
 
 - name: Generate OTP_SECRET secret
-  shell: "RAILS_ENV=production ~/.rbenv/shims/bundle exec rake secret"
+  shell: "RAILS_ENV=production ~/.rbenv/shims/bundle exec rails secret"
   args:
     chdir: "{{ mastodon_home }}/{{ mastodon_path }}"
   register: otp_secret
   when: not production_config.stat.exists
 
 - name: "Generate VAPID key pair into {{ mastodon_home }}/{{ mastodon_path }}/vapid.tmp"
-  shell: "RAILS_ENV=production ~/.rbenv/shims/bundle exec rake mastodon:webpush:generate_vapid_key > {{ mastodon_home }}/{{ mastodon_path }}/vapid.tmp | head -1 | cut -c 19-"
+  shell: "RAILS_ENV=production ~/.rbenv/shims/bundle exec rails mastodon:webpush:generate_vapid_key > {{ mastodon_home }}/{{ mastodon_path }}/vapid.tmp"
   args:
     chdir: "{{ mastodon_home }}/{{ mastodon_path }}"
+  when: not production_config.stat.exists
+
+- name: "Generate Database encryption keys into {{ mastodon_home }}/{{ mastodon_path }}/db.tmp"
+  shell: "RAILS_ENV=production ~/.rbenv/shims/bundle exec rails db:encryption:init > {{ mastodon_home }}/{{ mastodon_path }}/db.tmp"
+  args:
+    chdir: "{{ mastodon_home }}/{{ mastodon_path }}"
+  when: not production_config.stat.exists
+
+- name: Get ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY secret
+  shell: "cat {{ mastodon_home }}/{{ mastodon_path }}/db.tmp | head -3 | tail -1 | cut -c 44-"
+  register: deterministic_key
+  when: not production_config.stat.exists
+
+- name: Get ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT secret
+  shell: "cat {{ mastodon_home }}/{{ mastodon_path }}/db.tmp | head -4 | tail -1 | cut -c 46-"
+  register: key_derivation_salt
+  when: not production_config.stat.exists
+
+- name: Get ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY secret
+  shell: "cat {{ mastodon_home }}/{{ mastodon_path }}/db.tmp | tail -1 | cut -c 38-"
+  register: primary_key
   when: not production_config.stat.exists
 
 - name: Get VAPID_PRIVATE_KEY secret
@@ -77,6 +105,11 @@
 - name: Ensure that the file used for vapid keypair generation is removed.
   ansible.builtin.file:
     path: "{{ mastodon_home }}/{{ mastodon_path }}/vapid.tmp"
+    state: absent
+
+- name: Ensure that the file used for Database encryption keys generation is removed.
+  ansible.builtin.file:
+    path: "{{ mastodon_home }}/{{ mastodon_path }}/db.tmp"
     state: absent
 
 - name: Install Production env file
@@ -140,13 +173,13 @@
 
 #https://github.com/nodejs/node/issues/40455
 #It's possible that this is a bug with ruby 3.0.3 and gets fixed with Mastodon 4.0.0
-- name: Precompile assets with Legacy OpenSSL provider for RHEL9
-  shell: "NODE_OPTIONS=--openssl-legacy-provider RAILS_ENV=production ~/.rbenv/shims/bundle exec rails assets:precompile"
-  args:
-    chdir: "{{ mastodon_home }}/{{ mastodon_path }}"
-  when: 
-  - ansible_os_family == "RedHat"
-  - ansible_facts['distribution_major_version'] == "9"
+#- name: Precompile assets with Legacy OpenSSL provider for RHEL9
+#  shell: "NODE_OPTIONS=--openssl-legacy-provider RAILS_ENV=production ~/.rbenv/shims/bundle exec rails assets:precompile"
+#  args:
+#    chdir: "{{ mastodon_home }}/{{ mastodon_path }}"
+#  when: 
+#  - ansible_os_family == "RedHat"
+#  - ansible_facts['distribution_major_version'] == "9"
 
 - name: Precompile assets
   shell: "RAILS_ENV=production ~/.rbenv/shims/bundle exec rails assets:precompile"

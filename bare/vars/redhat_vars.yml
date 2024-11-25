@@ -7,7 +7,7 @@ packages:
   - package: "make"
   - package: "curl"
   #  - package: "cron" installed by default
-  - package: "ffmpeg"
+  - package: "ffmpeg-free"
   - package: "file"
   - package: "gcc-c++"
   - package: "gcc"
